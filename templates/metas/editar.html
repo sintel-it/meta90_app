@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Meta{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" data-reveal>
+    <div class="col-lg-7">
+        <div class="app-card p-4 p-md-5">
+            <p class="eyebrow mb-2">AJUSTE DE OBJETIVO</p>
+            <h2 class="mb-4">Editar meta #{{ meta.id }}</h2>
+            <form action="{{ url_for('metas_bp.actualizar', meta_id=meta.id) }}" method="post" class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">Meta</label>
+                    <input type="text" name="meta" class="form-control app-input" value="{{ meta.meta }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Monto</label>
+                    <input type="number" step="0.01" min="0" name="monto" class="form-control app-input" value="{{ meta.monto }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ahorrado</label>
+                    <input type="number" step="0.01" min="0" name="ahorrado" class="form-control app-input" value="{{ meta.ahorrado }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Fecha limite</label>
+                    <input type="date" name="fecha_limite" class="form-control app-input" value="{{ fecha_limite_input }}" required>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button class="btn app-btn-success w-100">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Mobile API Client{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" data-reveal>
+    <div class="col-lg-7">
+        <div class="app-card p-4 p-md-5">
+            <p class="eyebrow mb-2">MOBILE LITE</p>
+            <h2 class="mb-3">Cliente Movil Ligero</h2>
+            <p class="soft-text">Usa tu token API para consultar resumen desde celular.</p>
+            <div class="stack-sm">
+                <input id="mobile-api-url" class="form-control app-input" value="{{ request.host_url.rstrip('/') }}/api/private/resumen">
+                <input id="mobile-api-token" class="form-control app-input" placeholder="Pega token mt90_...">
+                <button id="mobile-api-run" class="btn app-btn-primary">Consultar resumen</button>
+            </div>
+            <pre id="mobile-api-output" class="mt-3 p-3 rounded-3 border border-light-subtle soft-text mb-0">{}</pre>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const urlEl = document.getElementById("mobile-api-url");
+    const tokenEl = document.getElementById("mobile-api-token");
+    const runEl = document.getElementById("mobile-api-run");
+    const outEl = document.getElementById("mobile-api-output");
+    const storeKey = "meta90_mobile_token";
+    tokenEl.value = localStorage.getItem(storeKey) || "";
+
+    runEl.addEventListener("click", async function () {
+        const url = (urlEl.value || "").trim();
+        const token = (tokenEl.value || "").trim();
+        localStorage.setItem(storeKey, token);
+        outEl.textContent = "Consultando...";
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: { "Authorization": "Bearer " + token, "Accept": "application/json" }
+            });
+            const text = await res.text();
+            outEl.textContent = text;
+        } catch (err) {
+            outEl.textContent = String(err);
+        }
+    });
+});
+</script>
+{% endblock %}

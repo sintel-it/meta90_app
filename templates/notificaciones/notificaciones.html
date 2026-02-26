@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Notificaciones{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">CENTRO DE ALERTAS</p>
+    <h2 class="mb-0">Notificaciones de metas, calendario y mensajes</h2>
+    <div class="d-flex gap-2 flex-wrap mt-3">
+        <form method="post" action="{{ url_for('notificaciones_bp.descartar_todas') }}">
+            <button class="btn app-btn-ghost btn-sm">Descartar todo (hoy)</button>
+        </form>
+        <form method="post" action="{{ url_for('notificaciones_bp.restaurar_hoy') }}">
+            <button class="btn app-btn-primary btn-sm">Restaurar descartadas (hoy)</button>
+        </form>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-6" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h4 class="mb-3">Por vencer <span class="status-badge badge-warning">0-3 dias</span></h4>
+            {% if notis.por_vencer %}
+                <div class="d-grid gap-2">
+                    {% for item in notis.por_vencer %}
+                        <div class="p-3 border rounded-3 border-warning-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="fw-semibold">{{ item.meta }}</div>
+                                <form method="post" action="{{ url_for('notificaciones_bp.descartar_notificacion') }}">
+                                    <input type="hidden" name="tipo" value="meta_por_vencer">
+                                    <input type="hidden" name="referencia" value="{{ item.id }}">
+                                    <button class="btn app-btn-ghost btn-sm py-0 px-2" title="Eliminar notificacion">x</button>
+                                </form>
+                            </div>
+                            <small class="soft-text">Fecha: {{ item.fecha_limite }} | <span class="status-badge badge-warning">Faltan {{ item.dias }} dias</span></small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="app-empty mb-0">No tienes metas por vencer en los proximos 3 dias.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-6" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h4 class="mb-3">Vencidas <span class="status-badge badge-danger">Urgente</span></h4>
+            {% if notis.vencidas %}
+                <div class="d-grid gap-2">
+                    {% for item in notis.vencidas %}
+                        <div class="p-3 border rounded-3 border-danger-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="fw-semibold">{{ item.meta }}</div>
+                                <form method="post" action="{{ url_for('notificaciones_bp.descartar_notificacion') }}">
+                                    <input type="hidden" name="tipo" value="meta_vencida">
+                                    <input type="hidden" name="referencia" value="{{ item.id }}">
+                                    <button class="btn app-btn-ghost btn-sm py-0 px-2" title="Eliminar notificacion">x</button>
+                                </form>
+                            </div>
+                            <small class="soft-text">Fecha: {{ item.fecha_limite }} | <span class="status-badge badge-danger">Vencida hace {{ item.dias }} dias</span></small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="app-empty mb-0">No tienes metas vencidas.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-6" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h4 class="mb-3">Calendario <span class="status-badge badge-info">Hoy + 3 dias</span></h4>
+            {% if notis.eventos_hoy or notis.eventos_proximos %}
+                <div class="d-grid gap-2">
+                    {% for item in notis.eventos_hoy %}
+                        <div class="p-3 border rounded-3 border-info-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="fw-semibold">{{ item.titulo }}</div>
+                                <form method="post" action="{{ url_for('notificaciones_bp.descartar_notificacion') }}">
+                                    <input type="hidden" name="tipo" value="calendario_hoy">
+                                    <input type="hidden" name="referencia" value="{{ item.id }}">
+                                    <button class="btn app-btn-ghost btn-sm py-0 px-2" title="Eliminar notificacion">x</button>
+                                </form>
+                            </div>
+                            <small class="soft-text"><span class="status-badge badge-info">Hoy</span> {{ item.fecha_evento }}{% if item.hora_evento %} {{ item.hora_evento }}{% endif %}</small>
+                        </div>
+                    {% endfor %}
+                    {% for item in notis.eventos_proximos %}
+                        <div class="p-3 border rounded-3 border-info-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="fw-semibold">{{ item.titulo }}</div>
+                                <form method="post" action="{{ url_for('notificaciones_bp.descartar_notificacion') }}">
+                                    <input type="hidden" name="tipo" value="calendario_proximo">
+                                    <input type="hidden" name="referencia" value="{{ item.id }}">
+                                    <button class="btn app-btn-ghost btn-sm py-0 px-2" title="Eliminar notificacion">x</button>
+                                </form>
+                            </div>
+                            <small class="soft-text">{{ item.fecha_evento }}{% if item.hora_evento %} {{ item.hora_evento }}{% endif %} | <span class="status-badge badge-warning">Faltan {{ item.dias }} dias</span></small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="app-empty mb-0">No hay eventos de calendario para hoy o proximos 3 dias.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-6" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h4 class="mb-3">Mensajes <span class="status-badge badge-info">Sin leer</span></h4>
+            {% if notis.mensajes_no_leidos_total > 0 %}
+                <p class="soft-text mb-3">Tienes {{ notis.mensajes_no_leidos_total }} mensaje(s) sin leer.</p>
+                <div class="d-grid gap-2">
+                    {% for item in notis.mensajes_no_leidos_recientes %}
+                        <div class="p-3 border rounded-3 border-light-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="fw-semibold">{{ item.asunto }}</div>
+                                <form method="post" action="{{ url_for('notificaciones_bp.descartar_notificacion') }}">
+                                    <input type="hidden" name="tipo" value="mensaje_no_leido">
+                                    <input type="hidden" name="referencia" value="{{ item.id }}">
+                                    <button class="btn app-btn-ghost btn-sm py-0 px-2" title="Eliminar notificacion">x</button>
+                                </form>
+                            </div>
+                            <small class="soft-text">De: {{ item.remitente }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="app-empty mb-0">No tienes mensajes sin leer en entrada.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-12" data-reveal>
+        <div class="app-card p-4">
+            <h4 class="mb-2">Push en navegador</h4>
+            <p class="soft-text mb-3">Activa notificaciones push en este dispositivo. Los envios son automaticos.</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" id="push-enable-btn" class="btn app-btn-primary">Activar Push Automatico</button>
+            </div>
+            <div id="push-status" class="mt-2 mb-0" hidden></div>
+        </div>
+    </div>
+
+    {% if current_role == 'admin' %}
+    <div class="col-12" data-reveal>
+        <div class="app-card p-4">
+            <h4 class="mb-2">Panel Admin</h4>
+            <p class="soft-text mb-3">Ejecucion manual inmediata de notificaciones multicanal.</p>
+            <div class="p-3 rounded-3 border border-light-subtle mb-3">
+                <div class="fw-semibold mb-1">Estado SMS: {{ sms_status.label }}</div>
+                <small class="soft-text d-block">{{ sms_status.detalle }}</small>
+                {% if sms_status.destinos %}
+                    <small class="soft-text d-block mt-1">Destinos detectados: {{ sms_status.destinos | join(', ') }}</small>
+                {% endif %}
+                {% if sms_status.trial_blocked %}
+                    <a class="btn app-btn-ghost btn-sm mt-2" href="https://console.twilio.com/us1/develop/phone-numbers/manage/verified" target="_blank" rel="noopener">Verificar numeros en Twilio</a>
+                {% endif %}
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" id="admin-run-noti-btn" class="btn app-btn-warning">Ejecutar notificaciones ahora</button>
+            </div>
+            <div id="admin-run-noti-result" class="mt-3 p-3 rounded-3 border border-light-subtle" hidden></div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/push.js') }}"></script>
+{% if current_role == 'admin' %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("admin-run-noti-btn");
+    const result = document.getElementById("admin-run-noti-result");
+    if (!btn || !result) return;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
+
+    function escapeHtml(v) {
+        return String(v ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
+    }
+
+    function channelRow(label, enviados, omitidos, errores, detalle) {
+        const estado = errores > 0 ? "Con errores" : (enviados > 0 ? "Enviado" : "Sin envio");
+        let detalleTxt = String(detalle || "-");
+        if (detalleTxt.includes('"code":21608') || detalleTxt.includes("code\":21608") || detalleTxt.includes("21608")) {
+            detalleTxt = "Numero destino no verificado en Twilio Trial. Verificalo en Twilio o usa cuenta de pago.";
+        }
+        const safeDetalle = escapeHtml(detalleTxt);
+        return (
+            '<div class="p-2 border rounded-3 border-light-subtle mb-2">' +
+                '<div class="fw-semibold">' + label + ': ' + estado + '</div>' +
+                '<small class="soft-text">Enviados: ' + enviados + ' | Omitidos: ' + omitidos + ' | Errores: ' + errores + '</small><br>' +
+                '<small class="soft-text">Detalle: ' + safeDetalle + '</small>' +
+            '</div>'
+        );
+    }
+
+    function renderResumen(resumen) {
+        const totalErrores = Number(resumen.errores || 0) + Number(resumen.push_errores || 0) + Number(resumen.email_errores || 0);
+        const totalEnviados = Number(resumen.enviados || 0) + Number(resumen.push_enviados || 0) + Number(resumen.email_enviados || 0);
+        const estadoGeneral = totalErrores > 0 ? "Ejecucion completada con errores." : "Ejecucion completada correctamente.";
+
+        const html =
+            '<div class="mb-2 fw-semibold">' + estadoGeneral + '</div>' +
+            '<small class="soft-text d-block mb-3">Usuarios con SMS: ' + (resumen.sms_usuarios_total || 0) +
+                ' | Usuarios con Push: ' + (resumen.push_usuarios_total || 0) +
+                ' | Usuarios con Email: ' + (resumen.email_usuarios_total || 0) +
+                ' | Total enviados: ' + totalEnviados + '</small>' +
+            channelRow("SMS", resumen.sms_enviados || 0, resumen.sms_omitidos || 0, resumen.sms_errores || 0, resumen.sms_detalle || "") +
+            channelRow("Push", resumen.push_enviados || 0, resumen.push_omitidos || 0, resumen.push_errores || 0, resumen.push_detalle || "") +
+            channelRow("Email", resumen.email_enviados || 0, resumen.email_omitidos || 0, resumen.email_errores || 0, resumen.email_detalle || "") +
+            '<details class="mt-2"><summary class="soft-text">Ver detalle tecnico (JSON)</summary>' +
+            '<pre class="mb-0 mt-2 p-2 rounded-3 border border-light-subtle soft-text">' + escapeHtml(JSON.stringify(resumen, null, 2)) + '</pre></details>';
+        result.innerHTML = html;
+    }
+
+    btn.addEventListener("click", async function () {
+        btn.disabled = true;
+        result.hidden = false;
+        result.textContent = "Ejecutando...";
+        try {
+            const resp = await fetch("/admin/notificaciones/ejecutar", {
+                method: "POST",
+                headers: { "X-CSRF-Token": csrf },
+            });
+            const data = await resp.json();
+            if (!resp.ok || !data.ok) {
+                throw new Error(data.error || ("HTTP " + resp.status));
+            }
+            renderResumen(data.resumen || {});
+        } catch (err) {
+            result.textContent = "Error: " + err.message;
+        } finally {
+            btn.disabled = false;
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

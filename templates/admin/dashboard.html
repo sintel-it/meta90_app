@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">ADMIN</p>
+    <h2 class="mb-0">Control Operativo</h2>
+    <div class="d-flex gap-2 flex-wrap mt-3">
+        <a href="{{ url_for('admin_reporte_avanzado') }}" class="btn app-btn-primary btn-sm">Reporte Avanzado</a>
+        <a href="{{ url_for('admin_reporte_excel') }}" class="btn app-btn-success btn-sm">Reporte Excel</a>
+        <a href="{{ url_for('admin_reporte_pdf') }}" class="btn app-btn-warning btn-sm">Reporte PDF</a>
+        <a href="{{ url_for('admin_usuarios') }}" class="btn app-btn-ghost btn-sm">Usuarios y Roles</a>
+        <form method="post" action="{{ url_for('admin_db_restore_emergency') }}" onsubmit="return confirm('Restaurar ultimo backup ahora?');">
+            <button class="btn app-btn-danger btn-sm">Restore emergencia</button>
+        </form>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-12" data-reveal>
+        <div class="app-card p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h5 class="mb-1">Semaforo Diario</h5>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        {% if reporte_diario.status == 'green' %}
+                            <span id="semaforo-badge" class="badge text-bg-success rounded-pill px-3 py-2">Verde - {{ reporte_diario.label }}</span>
+                        {% elif reporte_diario.status == 'yellow' %}
+                            <span id="semaforo-badge" class="badge text-bg-warning rounded-pill px-3 py-2">Amarillo - {{ reporte_diario.label }}</span>
+                        {% else %}
+                            <span id="semaforo-badge" class="badge text-bg-danger rounded-pill px-3 py-2">Rojo - {{ reporte_diario.label }}</span>
+                        {% endif %}
+                        <small id="semaforo-ts" class="soft-text">Ultimo reporte: {{ reporte_diario.timestamp }}</small>
+                    </div>
+                    <small id="semaforo-summary" class="soft-text">{{ reporte_diario.summary }}</small>
+                </div>
+                <form method="post" action="{{ url_for('admin_toggle_mantenimiento_notificaciones') }}">
+                    <input type="hidden" name="accion" value="{% if mantenimiento_notificaciones %}off{% else %}on{% endif %}">
+                    {% if mantenimiento_notificaciones %}
+                        <button class="btn app-btn-success btn-sm">Desactivar mantenimiento</button>
+                    {% else %}
+                        <button class="btn app-btn-warning btn-sm">Activar mantenimiento</button>
+                    {% endif %}
+                </form>
+            </div>
+            <div id="semaforo-items" class="row g-2 mt-2">
+                {% for it in reporte_diario['items'] %}
+                    <div class="col-6 col-md-3">
+                        <div class="p-2 border rounded-3 border-light-subtle">
+                            <small class="soft-text d-block">{{ it.name }}</small>
+                            <strong>{{ it.value }}</strong>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" data-reveal>
+        <div class="app-card p-4">
+            <ul class="nav nav-pills mb-3" id="admin-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-auditoria" type="button">Auditoria</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-operacion" type="button">Operacion</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="tab-auditoria" role="tabpanel">
+                    <form method="get" action="{{ url_for('admin_dashboard') }}" class="row g-2 mb-3">
+                        <div class="col-sm-6 col-md-2"><input type="date" name="fecha_desde" class="form-control app-input" value="{{ filtros.fecha_desde }}"></div>
+                        <div class="col-sm-6 col-md-2"><input type="date" name="fecha_hasta" class="form-control app-input" value="{{ filtros.fecha_hasta }}"></div>
+                        <div class="col-sm-6 col-md-2"><input name="actor" class="form-control app-input" value="{{ filtros.actor }}" placeholder="Usuario"></div>
+                        <div class="col-sm-6 col-md-2"><input name="modulo" class="form-control app-input" value="{{ filtros.modulo }}" placeholder="Modulo"></div>
+                        <div class="col-sm-6 col-md-2"><input name="accion" class="form-control app-input" value="{{ filtros.accion }}" placeholder="Accion"></div>
+                        <div class="col-sm-6 col-md-2"><input name="detalle_q" class="form-control app-input" value="{{ filtros.detalle_q }}" placeholder="Detalle"></div>
+                        <div class="col-sm-6 col-md-2"><button class="btn app-btn-primary w-100">Filtrar</button></div>
+                    </form>
+
+                    {% if saved_filters %}
+                    <div class="d-flex gap-2 flex-wrap mb-3">
+                        {% for sf in saved_filters %}
+                            <a href="{{ url_for('admin_dashboard', fecha_desde=sf.fecha_desde, fecha_hasta=sf.fecha_hasta, actor=sf.actor, modulo=sf.modulo, accion=sf.accion, detalle_q=sf.detalle_q) }}" class="btn app-btn-ghost btn-sm">{{ sf.nombre }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="table-responsive">
+                        <table class="table align-middle app-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th><th>Usuario</th><th>Modulo</th><th>Accion</th><th>Entidad</th><th>ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in audit_rows %}
+                                <tr>
+                                    <td>{{ a.creado_en }}</td>
+                                    <td>{{ a.actor or '-' }}</td>
+                                    <td>{{ a.modulo }}</td>
+                                    <td>{{ a.accion }}</td>
+                                    <td>{{ a.entidad }}</td>
+                                    <td>{{ a.entidad_id or '-' }}</td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="6" class="text-center py-4"><div class="app-empty">Sin eventos de auditoria.</div></td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="soft-text">Pagina {{ page }} de {{ total_pages }} ({{ total_audit }} registros)</small>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('admin_dashboard', fecha_desde=filtros.fecha_desde, fecha_hasta=filtros.fecha_hasta, actor=filtros.actor, modulo=filtros.modulo, accion=filtros.accion, detalle_q=filtros.detalle_q, page=page-1) }}" class="btn app-btn-ghost btn-sm {% if page <= 1 %}disabled{% endif %}">Anterior</a>
+                            <a href="{{ url_for('admin_dashboard', fecha_desde=filtros.fecha_desde, fecha_hasta=filtros.fecha_hasta, actor=filtros.actor, modulo=filtros.modulo, accion=filtros.accion, detalle_q=filtros.detalle_q, page=page+1) }}" class="btn app-btn-ghost btn-sm {% if page >= total_pages %}disabled{% endif %}">Siguiente</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-operacion" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h6>Tareas</h6>
+                            <div class="d-grid gap-2">
+                                {% for t in tareas %}
+                                    <div class="p-2 border rounded-3 border-light-subtle">
+                                        <div class="fw-semibold">{{ t.task }}</div>
+                                        <small class="soft-text">{{ t.summary }}</small>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <h6>Health</h6>
+                            <pre class="mb-0 p-3 rounded-3 border border-light-subtle soft-text">{{ health | tojson(indent=2) }}</pre>
+                        </div>
+                        <div class="col-12">
+                            <h6>Metricas 7 dias</h6>
+                            <div class="table-responsive">
+                                <table class="table align-middle app-table mb-0">
+                                    <thead><tr><th>Dia</th><th>Metas</th><th>Calendario</th><th>Mensajes</th><th>Login fail</th></tr></thead>
+                                    <tbody>
+                                        {% for m in metricas_7d.serie %}
+                                            <tr><td>{{ m.dia }}</td><td>{{ m.metas }}</td><td>{{ m.calendario }}</td><td>{{ m.mensajes }}</td><td>{{ m.login_fail }}</td></tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const badge = document.getElementById("semaforo-badge");
+    const ts = document.getElementById("semaforo-ts");
+    const summary = document.getElementById("semaforo-summary");
+    const items = document.getElementById("semaforo-items");
+    if (!badge || !ts || !summary || !items) return;
+
+    function badgeText(status, label) {
+        if (status === "green") return "Verde - " + label;
+        if (status === "yellow") return "Amarillo - " + label;
+        return "Rojo - " + label;
+    }
+    function badgeClass(status) {
+        if (status === "green") return "badge text-bg-success rounded-pill px-3 py-2";
+        if (status === "yellow") return "badge text-bg-warning rounded-pill px-3 py-2";
+        return "badge text-bg-danger rounded-pill px-3 py-2";
+    }
+    function renderItems(dataItems) {
+        const html = (dataItems || []).map(function (it) {
+            return '<div class="col-6 col-md-3"><div class="p-2 border rounded-3 border-light-subtle"><small class="soft-text d-block">' + it.name + '</small><strong>' + it.value + '</strong></div></div>';
+        }).join("");
+        items.innerHTML = html;
+    }
+    async function refreshSemaforo() {
+        badge.className = "badge text-bg-secondary rounded-pill px-3 py-2";
+        badge.textContent = "Actualizando...";
+        try {
+            const res = await fetch("{{ url_for('admin_reporte_diario_status') }}", { method: "GET", headers: { "Accept": "application/json" }, credentials: "same-origin" });
+            if (!res.ok) { badge.textContent = "Sin conexion"; return; }
+            const data = await res.json();
+            badge.className = badgeClass(data.status || "red");
+            badge.textContent = badgeText(data.status || "red", data.label || "Alerta");
+            ts.textContent = "Ultimo reporte: " + (data.timestamp || "-");
+            summary.textContent = data.summary || "";
+            renderItems(data.items || []);
+        } catch (_) {
+            badge.textContent = "Sin conexion";
+        }
+    }
+    refreshSemaforo();
+    setInterval(refreshSemaforo, 60000);
+});
+</script>
+{% endblock %}

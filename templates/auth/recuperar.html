@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Recuperar Cuenta{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" data-reveal>
+    <div class="col-lg-6">
+        <div class="app-card p-4 p-md-5">
+            <p class="eyebrow mb-2">RECUPERACION</p>
+            <h2 class="mb-3">Recuperar acceso</h2>
+            <p class="soft-text">Ingresa tu usuario o email para recibir un codigo de recuperacion.</p>
+            {% if not correo_config_ok %}
+                <div class="alert alert-warning mt-2">
+                    No hay proveedor de correo configurado (Resend o SMTP).
+                </div>
+            {% else %}
+                <div class="alert alert-info mt-2">
+                    Ruta activa de envio: {{ correo_provider }}
+                </div>
+            {% endif %}
+            <form method="post" class="stack-sm mt-3">
+                <div>
+                    <label class="form-label">Usuario o email</label>
+                    <input type="text" name="identificador" class="form-control app-input" required>
+                </div>
+                <button class="btn app-btn-primary">Enviar codigo</button>
+            </form>
+            <a href="{{ url_for('auth_bp.restablecer_contrasena') }}" class="btn app-btn-success mt-3">Ya tengo codigo</a>
+            <a href="{{ url_for('auth_bp.login') }}" class="btn app-btn-ghost mt-3">Volver al login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

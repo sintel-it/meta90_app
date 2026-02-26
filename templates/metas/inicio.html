@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">DASHBOARD</p>
+    <h2 class="mb-0">Resumen ejecutivo</h2>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-lg-8" data-reveal>
+        <div class="app-card p-4">
+            <h4 class="mb-3">Accesos rápidos</h4>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('metas_bp.ver_metas') }}" class="btn app-btn-primary">Ver metas</a>
+                <a href="{{ url_for('calendario_bp.calendario') }}" class="btn app-btn-ghost">Calendario</a>
+                <a href="{{ url_for('mensajes_bp.mensajes') }}" class="btn app-btn-ghost">Mensajes</a>
+                <a href="{{ url_for('notificaciones_bp.notificaciones') }}" class="btn app-btn-warning">Notificaciones</a>
+            </div>
+            <div class="mt-3 soft-text">
+                Metas: <span class="status-badge badge-info">{{ kpis.metas_total }}</span>
+                Eventos hoy: <span class="status-badge badge-warning">{{ kpis.eventos_hoy }}</span>
+                Sin leer: <span class="status-badge badge-info">{{ kpis.mensajes_no_leidos }}</span>
+                Alertas: <span class="status-badge badge-danger">{{ kpis.alertas_total }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h4 class="mb-3">Nueva meta</h4>
+            <form action="{{ url_for('metas_bp.crear_meta') }}" method="post" class="stack-sm">
+                <div>
+                    <label class="form-label">Meta</label>
+                    <input type="text" name="meta" class="form-control app-input" required>
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="form-label">Monto</label>
+                        <input type="number" step="0.01" min="0" name="monto" class="form-control app-input" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Ahorrado</label>
+                        <input type="number" step="0.01" min="0" name="ahorrado" class="form-control app-input" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Fecha limite</label>
+                    <input type="date" name="fecha_limite" class="form-control app-input" required>
+                </div>
+                <button class="btn app-btn-primary">Crear meta</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4">
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h5 class="mb-3">Metas recientes</h5>
+            <div class="d-grid gap-2">
+                {% for m in metas_recientes %}
+                    <div class="message-item rounded-3">
+                        <div class="fw-semibold">{{ m.meta }}</div>
+                        <small class="soft-text">{{ m.fecha_limite }} | ${{ '%.2f'|format(m.ahorrado) }} / ${{ '%.2f'|format(m.monto) }}</small>
+                    </div>
+                {% else %}
+                    <div class="app-empty">Sin metas registradas.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h5 class="mb-3">Eventos próximos</h5>
+            <div class="d-grid gap-2">
+                {% for e in eventos_proximos %}
+                    <div class="message-item rounded-3">
+                        <div class="fw-semibold">{{ e.titulo }}</div>
+                        <small class="soft-text">{{ e.fecha_evento }}{% if e.hora_evento %} {{ e.hora_evento }}{% endif %}</small>
+                    </div>
+                {% else %}
+                    <div class="app-empty">Sin eventos próximos.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h5 class="mb-3">Timeline de actividad</h5>
+            <div class="timeline-list">
+                {% for a in actividad_reciente %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div>
+                            <div class="fw-semibold">{{ a.modulo }} · {{ a.accion }} · {{ a.entidad }}</div>
+                            <small class="soft-text">{{ a.creado_en }}</small>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="app-empty">Sin actividad reciente.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

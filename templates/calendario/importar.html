@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Importar Calendario{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">CALENDARIO</p>
+    <h2 class="mb-0">Importar Eventos</h2>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-5" data-reveal>
+        <div class="app-card p-4">
+            <h5 class="mb-3">Archivo</h5>
+            <form method="post" enctype="multipart/form-data" class="stack-sm">
+                <input type="file" name="archivo" class="form-control app-input" accept=".csv,.xlsx" required>
+                <button class="btn app-btn-primary">Cargar vista previa</button>
+                <a href="{{ url_for('calendario_bp.calendario') }}" class="btn app-btn-ghost">Volver</a>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-7" data-reveal>
+        <div class="app-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Vista previa</h5>
+                <small class="soft-text">{{ total_preview }} evento(s)</small>
+            </div>
+            {% if preview %}
+                <div class="table-responsive mb-3">
+                    <table class="table align-middle app-table mb-0">
+                        <thead><tr><th>Fecha</th><th>Hora</th><th>Titulo</th><th>Grupo</th><th>Lugar</th><th>Tipo</th></tr></thead>
+                        <tbody>
+                            {% for e in preview[:50] %}
+                            <tr>
+                                <td>{{ e.fecha_evento }}</td>
+                                <td>{{ e.hora_evento or '-' }}</td>
+                                <td>{{ e.titulo }}</td>
+                                <td>{{ e.grupo or '-' }}</td>
+                                <td>{{ e.lugar or '-' }}</td>
+                                <td>{{ e.tipo or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <form method="post" action="{{ url_for('calendario_bp.confirmar_importacion_eventos') }}">
+                    <button class="btn app-btn-success">Confirmar importacion</button>
+                </form>
+            {% else %}
+                <div class="app-empty">Sube un archivo para previsualizar.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

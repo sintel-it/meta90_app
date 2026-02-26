@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<section class="row justify-content-center align-items-center g-4">
+    <div class="col-lg-5" data-reveal>
+        <p class="eyebrow">PLANIFICACION INTELIGENTE</p>
+        <h1 class="hero-title">Convierte metas en logros medibles</h1>
+        <p class="hero-copy">Administra tus objetivos con una experiencia clara, visual y enfocada en progreso real.</p>
+        <div id="login-account-chooser" class="app-card p-4 login-account-chooser mt-3" hidden>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Cambiar de cuenta</h6>
+                <button type="button" id="login-account-close" class="btn btn-sm app-btn-ghost px-2 py-0 login-account-close" aria-label="Cerrar">&times;</button>
+            </div>
+            <div id="login-account-list" class="list-group mb-3 login-account-list"></div>
+            <button type="button" id="login-add-account" class="btn app-btn-ghost w-100 text-start login-add-account">+ Agregar cuenta</button>
+        </div>
+    </div>
+    <div class="col-md-9 col-lg-5" data-reveal>
+        <div class="app-card p-4 login-card">
+            <h2 class="mb-4 text-center login-title">Iniciar sesion</h2>
+            <form method="post" class="stack-sm" autocomplete="on" id="login-form">
+                <div>
+                    <label class="form-label">Email o usuario</label>
+                    <input type="text" name="username" id="login-username" class="form-control app-input" value="{{ login_usuario or '' }}" autocomplete="username" required>
+                </div>
+                <div>
+                    <label class="form-label">Contrasena</label>
+                    <input type="password" name="password" id="login-password" class="form-control app-input" autocomplete="current-password" required>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="recordar_sesion" name="recordar_sesion" value="1" {% if recordar_sesion %}checked{% endif %}>
+                    <label class="form-check-label soft-text" for="recordar_sesion">
+                        Recordarme en este dispositivo
+                    </label>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-sm-4">
+                        <button class="btn app-btn-primary w-100">Entrar</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <a href="{{ url_for('auth_bp.registro') }}" class="btn app-btn-ghost w-100" title="Crear cuenta">?</a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="{{ url_for('auth_bp.recuperar_cuenta') }}" class="btn app-btn-success w-100">Recordar contrasena</a>
+                    </div>
+                </div>
+            </form>
+
+            <p class="text-center mt-5 mb-3 soft-text">o Entrar con su cuenta de:</p>
+            <div class="stack-sm">
+                {% if google_login_enabled %}
+                    <a href="{{ url_for('auth_bp.google_start') }}" class="btn app-btn-ghost w-100">Gmail/Google</a>
+                {% else %}
+                    <button type="button" class="btn app-btn-ghost w-100" disabled>Gmail/Google (no configurado)</button>
+                {% endif %}
+                {% if microsoft_login_enabled %}
+                    <a href="{{ url_for('auth_bp.microsoft_start') }}" class="btn app-btn-ghost w-100">Hotmail/Outlook</a>
+                {% else %}
+                    <button type="button" class="btn app-btn-ghost w-100" disabled>Hotmail/Outlook (no configurado)</button>
+                {% endif %}
+                {% if facebook_login_enabled %}
+                    <a href="{{ url_for('auth_bp.facebook_start') }}" class="btn app-btn-success w-100">
+                        Facebook
+                    </a>
+                {% endif %}
+            </div>
+
+            <p class="text-center mt-4 mb-0 soft-text">
+                No tienes cuenta? <a href="{{ url_for('auth_bp.registro') }}" class="app-link">Registrate aqui</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/login-account-chooser.js') }}"></script>
+{% endblock %}

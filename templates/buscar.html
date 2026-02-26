@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Busqueda Global{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">BUSQUEDA</p>
+    <h2 class="mb-0">Resultados globales</h2>
+</section>
+
+<div class="app-card p-4 mb-4" data-reveal>
+    <form method="get" action="{{ url_for('buscar_global') }}" class="d-flex gap-2">
+        <input name="q" class="form-control app-input" placeholder="Buscar metas, eventos, mensajes..." value="{{ q }}">
+        <button class="btn app-btn-primary">Buscar</button>
+    </form>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h5 class="mb-3">Metas</h5>
+            {% for m in resultados.metas %}
+                <div class="message-item rounded-3 mb-2">
+                    <div class="fw-semibold">{{ m.meta }}</div>
+                    <small class="soft-text">{{ m.fecha_limite }}</small>
+                </div>
+            {% else %}
+                <div class="app-empty">Sin resultados.</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h5 class="mb-3">Eventos</h5>
+            {% for e in resultados.eventos %}
+                <div class="message-item rounded-3 mb-2">
+                    <div class="fw-semibold">{{ e.titulo }}</div>
+                    <small class="soft-text">{{ e.fecha_evento }}{% if e.grupo %} · {{ e.grupo }}{% endif %}{% if e.lugar %} · {{ e.lugar }}{% endif %}</small>
+                </div>
+            {% else %}
+                <div class="app-empty">Sin resultados.</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 h-100">
+            <h5 class="mb-3">Mensajes</h5>
+            {% for m in resultados.mensajes %}
+                <div class="message-item rounded-3 mb-2">
+                    <div class="fw-semibold">{{ m.asunto }}</div>
+                    <small class="soft-text">{{ m.remitente }} · {{ m.carpeta }} · {{ m.creado_en[:16] }}</small>
+                </div>
+            {% else %}
+                <div class="app-empty">Sin resultados.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

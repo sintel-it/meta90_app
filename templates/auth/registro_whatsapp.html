@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Registro por WhatsApp{% endblock %}
+
+{% block content %}
+<section class="row justify-content-center align-items-center g-4">
+    <div class="col-lg-5" data-reveal>
+        <p class="eyebrow">ALTA CON WHATSAPP</p>
+        <h1 class="hero-title">Valida tu telefono y crea tu cuenta</h1>
+        <p class="hero-copy">
+            Paso 1: envia codigo. Paso 2: confirma codigo para terminar registro.
+        </p>
+    </div>
+    <div class="col-md-8 col-lg-4" data-reveal>
+        <div class="app-card p-4">
+            <h2 class="mb-4 text-center">Registro WhatsApp</h2>
+            {% if not whatsapp_registro_enabled %}
+                <div class="alert alert-warning">WhatsApp no esta configurado todavia en el servidor.</div>
+            {% endif %}
+
+            <form method="post" class="stack-sm">
+                <input type="hidden" name="accion" value="enviar">
+                <div>
+                    <label class="form-label">Usuario</label>
+                    <input type="text" name="usuario" class="form-control app-input" required>
+                </div>
+                <div>
+                    <label class="form-label">Telefono (formato internacional)</label>
+                    <input type="text" name="telefono" class="form-control app-input" placeholder="573001112233" required>
+                </div>
+                <div>
+                    <label class="form-label">Contrasena</label>
+                    <input type="password" name="contrasena" class="form-control app-input" required>
+                </div>
+                <button class="btn app-btn-primary w-100" {% if not whatsapp_registro_enabled %}disabled{% endif %}>
+                    Enviar codigo
+                </button>
+            </form>
+
+            <hr class="my-4">
+
+            <form method="post" class="stack-sm">
+                <input type="hidden" name="accion" value="verificar">
+                <div>
+                    <label class="form-label">Codigo recibido</label>
+                    <input type="text" name="codigo" maxlength="6" class="form-control app-input" required>
+                </div>
+                <button class="btn app-btn-success w-100">Verificar y crear cuenta</button>
+            </form>
+
+            <a href="{{ url_for('auth_bp.registro') }}" class="btn app-btn-ghost w-100 mt-3">Volver a registro</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

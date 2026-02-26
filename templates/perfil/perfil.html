@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center g-4" data-reveal>
+    <div class="col-lg-6">
+        <div class="app-card p-4 p-md-5">
+            <p class="eyebrow mb-2">MI PERFIL</p>
+            <h2 class="mb-3">Configurar contacto</h2>
+            <p class="soft-text">Email para recuperacion y telefono para alertas del sistema.</p>
+
+            <form method="post" class="stack-sm mt-3">
+                <input type="hidden" name="accion" value="perfil">
+                <div>
+                    <label class="form-label">Usuario</label>
+                    <input type="text" class="form-control app-input" value="{{ user.username }}" disabled>
+                </div>
+                <div>
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control app-input" value="{{ user.email or '' }}" required>
+                </div>
+                <div>
+                    <label class="form-label">Telefono (opcional)</label>
+                    <input type="text" name="telefono" class="form-control app-input" value="{{ user.telefono or '' }}" placeholder="573001112233">
+                </div>
+                <button class="btn app-btn-success">Guardar perfil</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="app-card p-4 p-md-5">
+            <p class="eyebrow mb-2">NOTIFICACIONES</p>
+            <h2 class="mb-3">Preferencias</h2>
+            <form method="post" class="stack-sm">
+                <input type="hidden" name="accion" value="prefs_noti">
+                <div class="d-flex gap-3 flex-wrap">
+                    <label><input type="checkbox" name="allow_email" value="1" {% if prefs_noti.allow_email %}checked{% endif %}> Email</label>
+                    <label><input type="checkbox" name="allow_sms" value="1" {% if prefs_noti.allow_sms %}checked{% endif %}> SMS</label>
+                    <label><input type="checkbox" name="allow_push" value="1" {% if prefs_noti.allow_push %}checked{% endif %}> Push</label>
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="form-label">Hora manana</label>
+                        <input type="number" min="5" max="12" name="morning_hour" class="form-control app-input" value="{{ prefs_noti.morning_hour }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Hora noche</label>
+                        <input type="number" min="17" max="23" name="night_hour" class="form-control app-input" value="{{ prefs_noti.night_hour }}">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Dias silencio</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% set dias = [('0','Lun'),('1','Mar'),('2','Mie'),('3','Jue'),('4','Vie'),('5','Sab'),('6','Dom')] %}
+                        {% for val, txt in dias %}
+                            <label class="small"><input type="checkbox" name="quiet_days" value="{{ val }}" {% if val|int in prefs_noti.quiet_days_list %}checked{% endif %}> {{ txt }}</label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="btn app-btn-primary">Guardar preferencias</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="app-card p-4 p-md-5">
+            <p class="eyebrow mb-2">API PRIVADA</p>
+            <h2 class="mb-3">Tokens</h2>
+            <a href="{{ url_for('mobile_client') }}" class="btn app-btn-ghost btn-sm mb-3">Abrir cliente movil lite</a>
+            <form method="post" class="d-flex gap-2 flex-wrap mb-3">
+                <input type="hidden" name="accion" value="api_token_new">
+                <input type="text" name="token_name" class="form-control app-input" style="max-width: 220px;" placeholder="Nombre token">
+                <button class="btn app-btn-warning">Generar token</button>
+            </form>
+            <div class="table-responsive">
+                <table class="table align-middle app-table mb-0">
+                    <thead>
+                        <tr><th>ID</th><th>Nombre</th><th>Activo</th><th>Creado</th><th>Ultimo uso</th><th>Accion</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for t in api_tokens %}
+                            <tr>
+                                <td>{{ t.id }}</td>
+                                <td>{{ t.name or '-' }}</td>
+                                <td>{{ 'si' if t.active else 'no' }}</td>
+                                <td>{{ t.created_at }}</td>
+                                <td>{{ t.last_used_at or '-' }}</td>
+                                <td>
+                                    {% if t.active %}
+                                    <form method="post">
+                                        <input type="hidden" name="accion" value="api_token_revoke">
+                                        <input type="hidden" name="token_id" value="{{ t.id }}">
+                                        <button class="btn app-btn-danger btn-sm">Revocar</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="6" class="text-center py-3"><div class="app-empty">Sin tokens.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

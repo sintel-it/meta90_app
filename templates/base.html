@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}Meta Inteligente{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/app.css', v='pro-polish3') }}" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+{% set endpoint = request.endpoint or '' %}
+{% if endpoint.startswith('calendario_bp.') %}
+    {% set module_class = 'module-calendario' %}
+    {% set current_module_key = 'calendario' %}
+{% elif endpoint.startswith('metas_bp.') %}
+    {% set module_class = 'module-metas' %}
+    {% set current_module_key = 'metas' %}
+{% elif endpoint.startswith('mensajes_bp.') %}
+    {% set module_class = 'module-mensajes' %}
+    {% set current_module_key = 'mensajes' %}
+{% elif endpoint.startswith('notificaciones_bp.') %}
+    {% set module_class = 'module-notificaciones' %}
+    {% set current_module_key = 'notificaciones' %}
+{% elif endpoint.startswith('perfil_bp.') %}
+    {% set module_class = 'module-perfil' %}
+    {% set current_module_key = 'perfil' %}
+{% elif endpoint in ('admin_dashboard', 'admin_usuarios', 'admin_reporte_excel', 'admin_reporte_pdf', 'admin_reporte_avanzado', 'admin_reporte_avanzado_csv', 'admin_reporte_avanzado_pdf', 'admin_audit_export_csv') %}
+    {% set module_class = 'module-default' %}
+    {% set current_module_key = 'admin' %}
+{% else %}
+    {% set module_class = 'module-default' %}
+    {% set current_module_key = 'metas' %}
+{% endif %}
+{% set module_nav = [
+    ('metas', url_for('metas_bp.inicio_metas')),
+    ('calendario', url_for('calendario_bp.calendario')),
+    ('mensajes', url_for('mensajes_bp.mensajes')),
+    ('notificaciones', url_for('notificaciones_bp.notificaciones')),
+    ('perfil', url_for('perfil_bp.perfil'))
+] %}
+{% if current_role == 'admin' %}
+    {% set module_nav = module_nav + [('admin', url_for('admin_dashboard'))] %}
+{% endif %}
+{% set ns = namespace(idx=0) %}
+{% for item in module_nav %}
+    {% if item[0] == current_module_key %}
+        {% set ns.idx = loop.index0 %}
+    {% endif %}
+{% endfor %}
+{% set prev_item = module_nav[(ns.idx - 1) % (module_nav|length)] %}
+{% set next_item = module_nav[(ns.idx + 1) % (module_nav|length)] %}
+<body class="app-loading {{ module_class }}">
+<div class="ambient-bg" aria-hidden="true"></div>
+<div class="ambient-brandmark" aria-hidden="true"></div>
+<nav class="navbar navbar-expand-lg app-nav">
+    <div class="container">
+        <a class="navbar-brand app-brand d-flex align-items-center gap-2" href="{{ url_for('metas_bp.inicio_metas') }}">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Meta Inteligente" class="app-logo">
+            <span>Meta Inteligente</span>
+        </a>
+        <div class="d-flex gap-2 align-items-center app-top-actions">
+            {% if session.get('usuario') %}
+                <form method="get" action="{{ url_for('buscar_global') }}" class="app-global-search d-flex gap-2">
+                    <input name="q" class="form-control app-input form-control-sm" placeholder="Buscar en todo..." value="{{ request.args.get('q','') if request.endpoint == 'buscar_global' else '' }}">
+                    <button class="btn app-btn-ghost btn-sm">Buscar</button>
+                </form>
+                <div class="app-main-links d-flex align-items-center">
+                    <a href="{{ url_for('metas_bp.inicio_metas') }}" class="app-nav-link {% if request.endpoint and request.endpoint.startswith('metas_bp.') %}is-active{% endif %}">Metas</a>
+                    <a href="{{ url_for('calendario_bp.calendario') }}" class="app-nav-link {% if request.endpoint and request.endpoint.startswith('calendario_bp.') %}is-active{% endif %}">Calendario</a>
+                    <a href="{{ url_for('mensajes_bp.mensajes') }}" class="app-nav-link {% if request.endpoint and request.endpoint.startswith('mensajes_bp.') %}is-active{% endif %}">Mensajes</a>
+                    <a href="{{ url_for('notificaciones_bp.notificaciones') }}" class="app-nav-link {% if request.endpoint and request.endpoint.startswith('notificaciones_bp.') %}is-active{% endif %}">
+                        Notificaciones
+                        {% if noti_count > 0 %}
+                            <span class="badge text-bg-warning ms-1">{{ noti_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{{ url_for('perfil_bp.perfil') }}" class="app-nav-link {% if request.endpoint and request.endpoint.startswith('perfil_bp.') %}is-active{% endif %}">Perfil</a>
+                    {% if current_role == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="app-nav-link {% if request.endpoint in ('admin_dashboard','admin_usuarios','admin_reporte_avanzado') %}is-active{% endif %}">Admin</a>
+                    {% endif %}
+                </div>
+                <div class="app-module-jump">
+                    <select id="app-module-select" class="form-select form-select-sm app-input">
+                        <option value="{{ url_for('metas_bp.inicio_metas') }}" {% if request.endpoint and request.endpoint.startswith('metas_bp.') %}selected{% endif %}>Metas</option>
+                        <option value="{{ url_for('calendario_bp.calendario') }}" {% if request.endpoint and request.endpoint.startswith('calendario_bp.') %}selected{% endif %}>Calendario</option>
+                        <option value="{{ url_for('mensajes_bp.mensajes') }}" {% if request.endpoint and request.endpoint.startswith('mensajes_bp.') %}selected{% endif %}>Mensajes</option>
+                        <option value="{{ url_for('notificaciones_bp.notificaciones') }}" {% if request.endpoint and request.endpoint.startswith('notificaciones_bp.') %}selected{% endif %}>Notificaciones</option>
+                        <option value="{{ url_for('perfil_bp.perfil') }}" {% if request.endpoint and request.endpoint.startswith('perfil_bp.') %}selected{% endif %}>Perfil</option>
+                        {% if current_role == 'admin' %}
+                            <option value="{{ url_for('admin_dashboard') }}" {% if request.endpoint in ('admin_dashboard','admin_usuarios','admin_reporte_avanzado') %}selected{% endif %}>Admin</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="app-user-actions d-flex align-items-center">
+                    <button type="button" id="compact-toggle-btn" class="btn btn-outline-light btn-sm app-pill-btn" title="Modo compacto">
+                        Compacto
+                    </button>
+                    <a href="{{ prev_item[1] }}" class="btn btn-outline-light btn-sm app-pill-btn" title="Modulo anterior">
+                        &lt;
+                    </a>
+                    <a href="{{ next_item[1] }}" class="btn btn-outline-light btn-sm app-pill-btn" title="Modulo siguiente">
+                        &gt;
+                    </a>
+                    <span id="current-session-user" data-username="{{ session.get('usuario') }}" hidden></span>
+                    <span class="navbar-text app-user-chip">{{ session.get('usuario') }}</span>
+                    {% if current_role == 'admin' %}
+                        <span class="navbar-text app-user-chip">admin</span>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-light btn-sm app-pill-btn" data-bs-toggle="modal" data-bs-target="#accountSwitcherModal">
+                        Cambiar cuenta
+                    </button>
+                    <a href="{{ url_for('auth_bp.logout') }}" class="btn btn-outline-light btn-sm app-pill-btn">Cerrar sesion</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+{% if session.get('usuario') and kpis_top %}
+<section class="container mt-3">
+    <div class="kpi-strip" data-reveal>
+        <div class="kpi-item">
+            <small class="soft-text">Metas</small>
+            <strong>{{ kpis_top.metas_total }}</strong>
+        </div>
+        <div class="kpi-item">
+            <small class="soft-text">Eventos hoy</small>
+            <strong>{{ kpis_top.eventos_hoy }}</strong>
+        </div>
+        <div class="kpi-item">
+            <small class="soft-text">Mensajes sin leer</small>
+            <strong>{{ kpis_top.mensajes_no_leidos }}</strong>
+        </div>
+        <div class="kpi-item">
+            <small class="soft-text">Alertas</small>
+            <strong>{{ kpis_top.alertas_total }}</strong>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<main class="container mt-4 pb-4">
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+            {% for categoria, mensaje in mensajes %}
+                <div class="alert alert-{{ categoria }} alert-dismissible fade show app-alert" role="alert">
+                    {{ mensaje }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+{% if session.get('usuario') %}
+<div class="modal fade" id="accountSwitcherModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Cambiar de cuenta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div id="account-switcher-list" class="list-group mb-3" data-active-user="{{ session.get('usuario') }}"></div>
+                <a href="{{ url_for('auth_bp.logout', clear_remember=1) }}" class="btn app-btn-ghost w-100">Agregar cuenta</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.body.classList.remove("app-loading");
+    const compactBtn = document.getElementById("compact-toggle-btn");
+    const compactKey = "meta90_compact_ui";
+    if (localStorage.getItem(compactKey) === "1") {
+        document.body.classList.add("compact-ui");
+    }
+    if (compactBtn) {
+        compactBtn.addEventListener("click", function () {
+            document.body.classList.toggle("compact-ui");
+            const on = document.body.classList.contains("compact-ui");
+            localStorage.setItem(compactKey, on ? "1" : "0");
+        });
+    }
+    const moduleSelect = document.getElementById("app-module-select");
+    if (moduleSelect) {
+        moduleSelect.addEventListener("change", function () {
+            const to = moduleSelect.value;
+            if (to) window.location.href = to;
+        });
+    }
+
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
+    if (csrfToken) {
+        document.querySelectorAll('form[method="post"], form[method="POST"]').forEach((form) => {
+            if (form.querySelector('input[name="_csrf_token"]')) return;
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "_csrf_token";
+            hidden.value = csrfToken;
+            form.appendChild(hidden);
+        });
+    }
+    document.querySelectorAll("form").forEach((form) => {
+        form.addEventListener("submit", function () {
+            const btn = form.querySelector('button[type="submit"], .btn');
+            if (!btn) return;
+            btn.classList.add("is-loading");
+            setTimeout(() => btn.classList.remove("is-loading"), 1800);
+        });
+    });
+
+});
+</script>
+{% if session.get('usuario') %}
+<script src="{{ url_for('static', filename='js/account-switcher.js') }}"></script>
+{% endif %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

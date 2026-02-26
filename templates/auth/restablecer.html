@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Restablecer Contrasena{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" data-reveal>
+    <div class="col-lg-6">
+        <div class="app-card p-4 p-md-5">
+            <p class="eyebrow mb-2">NUEVA CLAVE</p>
+            <h2 class="mb-3">Restablecer contrasena</h2>
+            <form method="post" class="stack-sm">
+                <div>
+                    <label class="form-label">Usuario o email</label>
+                    <input type="text" name="identificador" class="form-control app-input" required>
+                </div>
+                <div>
+                    <label class="form-label">Codigo de recuperacion</label>
+                    <input type="text" name="codigo" class="form-control app-input" maxlength="6" required>
+                </div>
+                <div>
+                    <label class="form-label">Nueva contrasena</label>
+                    <input type="password" name="contrasena" class="form-control app-input" required>
+                </div>
+                <div>
+                    <label class="form-label">Confirmar contrasena</label>
+                    <input type="password" name="confirmar_contrasena" class="form-control app-input" required>
+                </div>
+                <button class="btn app-btn-success">Guardar nueva contrasena</button>
+            </form>
+            <a href="{{ url_for('auth_bp.recuperar_cuenta') }}" class="btn app-btn-ghost mt-3">Solicitar codigo</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

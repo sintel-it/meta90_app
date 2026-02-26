@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">PLANIFICADOR</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <h2 class="mb-0 text-capitalize">{{ mes_nombre }} {{ anio }}</h2>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('calendario_bp.calendario', anio=prev_anio, mes=prev_mes, grupo=filtros.grupo, lugar=filtros.lugar, tipo=filtros.tipo) }}" class="btn app-btn-ghost">&lt;</a>
+            <a href="{{ url_for('calendario_bp.calendario', anio=hoy_anio, mes=hoy_mes) }}" class="btn app-btn-ghost">Hoy</a>
+            <a href="{{ url_for('calendario_bp.calendario', anio=next_anio, mes=next_mes, grupo=filtros.grupo, lugar=filtros.lugar, tipo=filtros.tipo) }}" class="btn app-btn-ghost">&gt;</a>
+        </div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 mb-4">
+            <h5 class="mb-3">Filtrar</h5>
+            <form method="get" class="stack-sm">
+                <input type="hidden" name="anio" value="{{ anio }}">
+                <input type="hidden" name="mes" value="{{ mes }}">
+                <div>
+                    <label class="form-label">Grupo</label>
+                    <input name="grupo" class="form-control app-input" list="grupos-list" value="{{ filtros.grupo }}" placeholder="Ej: trabajo">
+                    <datalist id="grupos-list">
+                        {% for item in opciones.grupo %}
+                            <option value="{{ item }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div>
+                    <label class="form-label">Lugar</label>
+                    <input name="lugar" class="form-control app-input" list="lugares-list" value="{{ filtros.lugar }}" placeholder="Ej: oficina">
+                    <datalist id="lugares-list">
+                        {% for item in opciones.lugar %}
+                            <option value="{{ item }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div>
+                    <label class="form-label">Tipo</label>
+                    <input name="tipo" class="form-control app-input" list="tipos-list" value="{{ filtros.tipo }}" placeholder="Ej: reunion">
+                    <datalist id="tipos-list">
+                        {% for item in opciones.tipo %}
+                            <option value="{{ item }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn app-btn-primary w-100">Filtrar</button>
+                    <a href="{{ url_for('calendario_bp.calendario', anio=anio, mes=mes) }}" class="btn app-btn-ghost">Limpiar</a>
+                </div>
+                <a href="{{ url_for('calendario_bp.exportar_eventos_pdf', anio=anio, mes=mes, grupo=filtros.grupo, lugar=filtros.lugar, tipo=filtros.tipo) }}" class="btn app-btn-warning w-100">
+                    Exportar PDF
+                </a>
+                <a href="{{ url_for('calendario_bp.importar_eventos') }}" class="btn app-btn-ghost w-100">
+                    Importar CSV/XLSX
+                </a>
+            </form>
+        </div>
+
+        <div class="app-card p-4">
+            <h5 class="mb-3">Crear Evento</h5>
+            <form method="post" action="{{ url_for('calendario_bp.crear_evento') }}" class="stack-sm">
+                <div>
+                    <label class="form-label">Titulo</label>
+                    <input type="text" name="titulo" class="form-control app-input" required>
+                </div>
+                <div class="row g-2">
+                    <div class="col-7">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" name="fecha_evento" class="form-control app-input" required>
+                    </div>
+                    <div class="col-5">
+                        <label class="form-label">Hora</label>
+                        <input type="time" name="hora_evento" class="form-control app-input">
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Grupo</label>
+                        <input type="text" name="grupo" class="form-control app-input">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Lugar</label>
+                        <input type="text" name="lugar" class="form-control app-input">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo</label>
+                        <input type="text" name="tipo" class="form-control app-input">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Descripcion</label>
+                    <textarea name="descripcion" rows="3" class="form-control app-input"></textarea>
+                </div>
+                <button class="btn app-btn-primary w-100">Crear evento</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8" data-reveal>
+        <div class="app-card p-3 p-md-4">
+            <div class="calendar-grid-header">
+                {% for d in dias_corto %}
+                    <div class="calendar-dow">{{ d }}</div>
+                {% endfor %}
+            </div>
+            <div class="calendar-grid-body">
+                {% for semana in semanas %}
+                    {% for celda in semana %}
+                        <div class="calendar-cell {% if not celda.en_mes %}calendar-cell-off{% endif %}">
+                            {% if celda.en_mes %}
+                                <div class="calendar-day">{{ celda.dia }}</div>
+                                <div class="calendar-events">
+                                    {% for ev in celda.eventos %}
+                                        <button
+                                            type="button"
+                                            class="calendar-event-chip calendar-event-btn"
+                                            title="{{ ev.descripcion }}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#eventoDetalleModal"
+                                            data-evento-id="{{ ev.id }}"
+                                            data-evento-titulo="{{ ev.titulo }}"
+                                            data-evento-fecha="{{ '%04d-%02d-%02d'|format(anio, mes, celda.dia) }}"
+                                            data-evento-hora="{{ ev.hora }}"
+                                            data-evento-grupo="{{ ev.grupo }}"
+                                            data-evento-lugar="{{ ev.lugar }}"
+                                            data-evento-tipo="{{ ev.tipo }}"
+                                            data-evento-descripcion="{{ ev.descripcion }}"
+                                        >
+                                            {% if ev.hora %}<span class="calendar-event-time">{{ ev.hora }}</span>{% endif %}
+                                            <span class="calendar-event-title">{{ ev.titulo }}</span>
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="app-card p-3 p-md-4 mt-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">Eventos del mes</h5>
+                <small class="soft-text">{{ total_eventos }} eventos</small>
+            </div>
+            {% if eventos_pagina %}
+                <div class="d-grid gap-2">
+                    {% for ev in eventos_pagina %}
+                        <div class="message-item p-2 border rounded-3 border-light-subtle">
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <div class="fw-semibold">{{ ev["titulo"] }}</div>
+                                <small class="soft-text">{{ ev["fecha_evento"] }}{% if ev["hora_evento"] %} {{ ev["hora_evento"] }}{% endif %}</small>
+                            </div>
+                            <small class="soft-text">
+                                {% if ev["grupo"] %}{{ ev["grupo"] }}{% endif %}
+                                {% if ev["grupo"] and ev["lugar"] %} | {% endif %}
+                                {% if ev["lugar"] %}{{ ev["lugar"] }}{% endif %}
+                                {% if (ev["grupo"] or ev["lugar"]) and ev["tipo"] %} | {% endif %}
+                                {% if ev["tipo"] %}{{ ev["tipo"] }}{% endif %}
+                            </small>
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn app-btn-ghost btn-sm py-0 px-2" type="button" data-bs-toggle="collapse" data-bs-target="#editar-evento-{{ ev['id'] }}">Editar</button>
+                                <form method="post" action="{{ url_for('calendario_bp.eliminar_evento', evento_id=ev['id']) }}" onsubmit="return confirm('Eliminar este evento?');">
+                                    <input type="hidden" name="ctx_anio" value="{{ anio }}">
+                                    <input type="hidden" name="ctx_mes" value="{{ mes }}">
+                                    <input type="hidden" name="ctx_grupo" value="{{ filtros.grupo }}">
+                                    <input type="hidden" name="ctx_lugar" value="{{ filtros.lugar }}">
+                                    <input type="hidden" name="ctx_tipo" value="{{ filtros.tipo }}">
+                                    <input type="hidden" name="ctx_page_eventos" value="{{ page_eventos }}">
+                                    <button class="btn app-btn-danger btn-sm py-0 px-2" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                            <div class="collapse mt-2" id="editar-evento-{{ ev['id'] }}">
+                                <form method="post" action="{{ url_for('calendario_bp.editar_evento', evento_id=ev['id']) }}" class="stack-sm">
+                                    <input type="hidden" name="ctx_anio" value="{{ anio }}">
+                                    <input type="hidden" name="ctx_mes" value="{{ mes }}">
+                                    <input type="hidden" name="ctx_grupo" value="{{ filtros.grupo }}">
+                                    <input type="hidden" name="ctx_lugar" value="{{ filtros.lugar }}">
+                                    <input type="hidden" name="ctx_tipo" value="{{ filtros.tipo }}">
+                                    <input type="hidden" name="ctx_page_eventos" value="{{ page_eventos }}">
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <input type="text" name="titulo" class="form-control app-input form-control-sm" value="{{ ev['titulo'] }}" required>
+                                        </div>
+                                        <div class="col-7">
+                                            <input type="date" name="fecha_evento" class="form-control app-input form-control-sm" value="{{ ev['fecha_evento'] }}" required>
+                                        </div>
+                                        <div class="col-5">
+                                            <input type="time" name="hora_evento" class="form-control app-input form-control-sm" value="{{ ev['hora_evento'] or '' }}">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" name="grupo" class="form-control app-input form-control-sm" value="{{ ev['grupo'] or '' }}" placeholder="Grupo">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" name="lugar" class="form-control app-input form-control-sm" value="{{ ev['lugar'] or '' }}" placeholder="Lugar">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" name="tipo" class="form-control app-input form-control-sm" value="{{ ev['tipo'] or '' }}" placeholder="Tipo">
+                                        </div>
+                                        <div class="col-12">
+                                            <textarea name="descripcion" rows="2" class="form-control app-input form-control-sm" placeholder="Descripcion">{{ ev['descripcion'] or '' }}</textarea>
+                                        </div>
+                                    </div>
+                                    <button class="btn app-btn-primary btn-sm" type="submit">Guardar cambios</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if total_paginas_eventos > 1 %}
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="soft-text">Pagina {{ page_eventos }} de {{ total_paginas_eventos }}</small>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('calendario_bp.calendario', anio=anio, mes=mes, grupo=filtros.grupo, lugar=filtros.lugar, tipo=filtros.tipo, page_eventos=page_eventos-1) }}" class="btn app-btn-ghost btn-sm {% if page_eventos <= 1 %}disabled{% endif %}">Anterior</a>
+                            <a href="{{ url_for('calendario_bp.calendario', anio=anio, mes=mes, grupo=filtros.grupo, lugar=filtros.lugar, tipo=filtros.tipo, page_eventos=page_eventos+1) }}" class="btn app-btn-ghost btn-sm {% if page_eventos >= total_paginas_eventos %}disabled{% endif %}">Siguiente</a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="app-empty">No hay eventos para este mes con los filtros actuales.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="eventoDetalleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="evento-detalle-titulo">Detalle del evento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="soft-text mb-2" id="evento-detalle-fecha-hora"></div>
+                <div class="mb-2"><strong>Grupo:</strong> <span id="evento-detalle-grupo">-</span></div>
+                <div class="mb-2"><strong>Lugar:</strong> <span id="evento-detalle-lugar">-</span></div>
+                <div class="mb-2"><strong>Tipo:</strong> <span id="evento-detalle-tipo">-</span></div>
+                <div class="mb-0"><strong>Descripcion:</strong> <span id="evento-detalle-descripcion">-</span></div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="button" class="btn app-btn-ghost btn-sm" data-bs-toggle="collapse" data-bs-target="#evento-detalle-editar">Editar</button>
+                    <form id="evento-detalle-eliminar-form" method="post" action="" onsubmit="return confirm('Eliminar este evento?');">
+                        <input type="hidden" name="ctx_anio" value="{{ anio }}">
+                        <input type="hidden" name="ctx_mes" value="{{ mes }}">
+                        <input type="hidden" name="ctx_grupo" value="{{ filtros.grupo }}">
+                        <input type="hidden" name="ctx_lugar" value="{{ filtros.lugar }}">
+                        <input type="hidden" name="ctx_tipo" value="{{ filtros.tipo }}">
+                        <input type="hidden" name="ctx_page_eventos" value="{{ page_eventos }}">
+                        <button type="submit" class="btn app-btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </div>
+
+                <div class="collapse mt-3" id="evento-detalle-editar">
+                    <form id="evento-detalle-editar-form" method="post" action="" class="stack-sm">
+                        <input type="hidden" name="ctx_anio" value="{{ anio }}">
+                        <input type="hidden" name="ctx_mes" value="{{ mes }}">
+                        <input type="hidden" name="ctx_grupo" value="{{ filtros.grupo }}">
+                        <input type="hidden" name="ctx_lugar" value="{{ filtros.lugar }}">
+                        <input type="hidden" name="ctx_tipo" value="{{ filtros.tipo }}">
+                        <input type="hidden" name="ctx_page_eventos" value="{{ page_eventos }}">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <input type="text" id="evento-editar-titulo" name="titulo" class="form-control app-input form-control-sm" required>
+                            </div>
+                            <div class="col-7">
+                                <input type="date" id="evento-editar-fecha" name="fecha_evento" class="form-control app-input form-control-sm" required>
+                            </div>
+                            <div class="col-5">
+                                <input type="time" id="evento-editar-hora" name="hora_evento" class="form-control app-input form-control-sm">
+                            </div>
+                            <div class="col-4">
+                                <input type="text" id="evento-editar-grupo" name="grupo" class="form-control app-input form-control-sm" placeholder="Grupo">
+                            </div>
+                            <div class="col-4">
+                                <input type="text" id="evento-editar-lugar" name="lugar" class="form-control app-input form-control-sm" placeholder="Lugar">
+                            </div>
+                            <div class="col-4">
+                                <input type="text" id="evento-editar-tipo" name="tipo" class="form-control app-input form-control-sm" placeholder="Tipo">
+                            </div>
+                            <div class="col-12">
+                                <textarea id="evento-editar-descripcion" name="descripcion" rows="2" class="form-control app-input form-control-sm" placeholder="Descripcion"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn app-btn-primary btn-sm">Guardar cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("eventoDetalleModal");
+    if (!modal) return;
+
+    modal.addEventListener("show.bs.modal", function (event) {
+        const btn = event.relatedTarget;
+        if (!btn) return;
+
+        const eventoId = btn.getAttribute("data-evento-id") || "";
+        const titulo = btn.getAttribute("data-evento-titulo") || "Evento";
+        const fecha = btn.getAttribute("data-evento-fecha") || "";
+        const hora = btn.getAttribute("data-evento-hora") || "";
+        const grupo = btn.getAttribute("data-evento-grupo") || "-";
+        const lugar = btn.getAttribute("data-evento-lugar") || "-";
+        const tipo = btn.getAttribute("data-evento-tipo") || "-";
+        const descripcion = btn.getAttribute("data-evento-descripcion") || "-";
+
+        document.getElementById("evento-detalle-titulo").textContent = titulo;
+        document.getElementById("evento-detalle-fecha-hora").textContent = hora ? `${fecha} ${hora}` : fecha;
+        document.getElementById("evento-detalle-grupo").textContent = grupo || "-";
+        document.getElementById("evento-detalle-lugar").textContent = lugar || "-";
+        document.getElementById("evento-detalle-tipo").textContent = tipo || "-";
+        document.getElementById("evento-detalle-descripcion").textContent = descripcion || "-";
+
+        const editarForm = document.getElementById("evento-detalle-editar-form");
+        const eliminarForm = document.getElementById("evento-detalle-eliminar-form");
+        if (editarForm && eventoId) {
+            editarForm.action = "/calendario/editar/" + eventoId;
+            document.getElementById("evento-editar-titulo").value = titulo;
+            document.getElementById("evento-editar-fecha").value = fecha;
+            document.getElementById("evento-editar-hora").value = hora;
+            document.getElementById("evento-editar-grupo").value = (grupo === "-" ? "" : grupo);
+            document.getElementById("evento-editar-lugar").value = (lugar === "-" ? "" : lugar);
+            document.getElementById("evento-editar-tipo").value = (tipo === "-" ? "" : tipo);
+            document.getElementById("evento-editar-descripcion").value = (descripcion === "-" ? "" : descripcion);
+        }
+        if (eliminarForm && eventoId) {
+            eliminarForm.action = "/calendario/eliminar/" + eventoId;
+        }
+    });
+});
+</script>
+{% endblock %}

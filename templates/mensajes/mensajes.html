@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Mensajes{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">COMUNICACION INTERNA</p>
+    <h2 class="mb-0">Mensajes</h2>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-4" data-reveal>
+        <div class="app-card p-4 compose-card-sticky">
+            <h5 class="mb-3">Nuevo mensaje</h5>
+            <form method="post" action="{{ url_for('mensajes_bp.nuevo_mensaje') }}" class="stack-sm">
+                <div>
+                    <label class="form-label">Para (usuario)</label>
+                    <input name="destinatario" class="form-control app-input" required>
+                </div>
+                <div>
+                    <label class="form-label">Asunto</label>
+                    <input name="asunto" class="form-control app-input" required>
+                </div>
+                <div>
+                    <label class="form-label">Mensaje</label>
+                    <textarea name="cuerpo" rows="5" class="form-control app-input" required></textarea>
+                </div>
+                <button class="btn app-btn-primary w-100">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8" data-reveal>
+        <div class="app-card p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div class="message-tabs d-flex flex-wrap gap-2">
+                <a href="{{ url_for('mensajes_bp.mensajes', carpeta='entrada', q=q) }}" class="btn {% if carpeta == 'entrada' %}app-btn-primary{% else %}app-btn-ghost{% endif %}">
+                    Entrada <span class="badge text-bg-light ms-1">{{ conteo.entrada }}</span>
+                </a>
+                <a href="{{ url_for('mensajes_bp.mensajes', carpeta='enviados', q=q) }}" class="btn {% if carpeta == 'enviados' %}app-btn-primary{% else %}app-btn-ghost{% endif %}">
+                    Enviados <span class="badge text-bg-light ms-1">{{ conteo.enviados }}</span>
+                </a>
+                <a href="{{ url_for('mensajes_bp.mensajes', carpeta='papelera', q=q) }}" class="btn {% if carpeta == 'papelera' %}app-btn-primary{% else %}app-btn-ghost{% endif %}">
+                    Papelera <span class="badge text-bg-light ms-1">{{ conteo.papelera }}</span>
+                </a>
+                </div>
+                <a href="{{ url_for('mensajes_bp.mensajes', carpeta=carpeta, q=q) }}" class="btn app-btn-ghost">Actualizar</a>
+            </div>
+
+            <form method="get" class="d-flex gap-2 mb-3">
+                <input type="hidden" name="carpeta" value="{{ carpeta }}">
+                <input name="q" class="form-control app-input" placeholder="Buscar" value="{{ q }}">
+                <button class="btn app-btn-ghost">Buscar</button>
+            </form>
+
+            {% if mensajes %}
+                <div class="d-grid gap-2">
+                    {% for m in mensajes %}
+                        <div class="message-item p-3 border rounded-3 border-light-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="message-avatar">
+                                        {% if carpeta == 'enviados' %}
+                                            {{ (m.destinatario or '?')[:1] | upper }}
+                                        {% else %}
+                                            {{ (m.remitente or '?')[:1] | upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-meta">
+                                    <div class="fw-semibold">{{ m.asunto }}</div>
+                                    <div class="soft-text small mb-1">
+                                        {% if carpeta == 'entrada' and not m.leido %}
+                                            <span class="status-badge badge-info">Sin leer</span>
+                                        {% endif %}
+                                        {% if carpeta == 'enviados' %}
+                                            Para: {{ m.destinatario or '-' }}
+                                        {% else %}
+                                            De: {{ m.remitente or '-' }}
+                                        {% endif %}
+                                    </div>
+                                    <p class="mb-2 mt-1 soft-text message-body">{{ m.cuerpo }}</p>
+                                    </div>
+                                </div>
+                                <small class="soft-text">{{ m.creado_en[:16] }}</small>
+                            </div>
+                            <div class="d-flex gap-2 message-actions">
+                                {% if carpeta == 'enviados' %}
+                                    <button class="btn app-btn-ghost btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#editar-msg-{{ m.id }}">
+                                        Editar
+                                    </button>
+                                {% endif %}
+                                <form method="post" action="{{ url_for('mensajes_bp.mover_mensaje', mensaje_id=m.id) }}">
+                                    <input type="hidden" name="carpeta" value="{{ carpeta }}">
+                                    <input type="hidden" name="q" value="{{ q }}">
+                                    {% if carpeta == 'papelera' %}
+                                        <input type="hidden" name="accion" value="restaurar">
+                                        <button class="btn app-btn-success btn-sm">Restaurar</button>
+                                    {% else %}
+                                        <input type="hidden" name="accion" value="papelera">
+                                        <button class="btn app-btn-danger btn-sm">Papelera</button>
+                                    {% endif %}
+                                </form>
+                                {% if carpeta == 'papelera' %}
+                                    <button
+                                        type="button"
+                                        class="btn app-btn-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#confirmarEliminarModal"
+                                        data-msg-id="{{ m.id }}"
+                                        data-msg-asunto="{{ m.asunto }}"
+                                    >
+                                        Eliminar
+                                    </button>
+                                {% endif %}
+                            </div>
+                            {% if carpeta == 'enviados' %}
+                                <div class="collapse mt-3" id="editar-msg-{{ m.id }}">
+                                    <form method="post" action="{{ url_for('mensajes_bp.editar_mensaje', mensaje_id=m.id) }}" class="stack-sm">
+                                        <input type="hidden" name="carpeta" value="{{ carpeta }}">
+                                        <input type="hidden" name="q" value="{{ q }}">
+                                        <div>
+                                            <label class="form-label">Asunto</label>
+                                            <input name="asunto" class="form-control app-input" value="{{ m.asunto }}" required>
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Mensaje</label>
+                                            <textarea name="cuerpo" rows="4" class="form-control app-input" required>{{ m.cuerpo }}</textarea>
+                                        </div>
+                                        <button class="btn app-btn-primary btn-sm">Guardar cambios</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if total_pages > 1 %}
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="soft-text">Pagina {{ page }} de {{ total_pages }} ({{ total_mensajes }} mensajes)</small>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('mensajes_bp.mensajes', carpeta=carpeta, q=q, page=page-1) }}" class="btn app-btn-ghost btn-sm {% if page <= 1 %}disabled{% endif %}">Anterior</a>
+                            <a href="{{ url_for('mensajes_bp.mensajes', carpeta=carpeta, q=q, page=page+1) }}" class="btn app-btn-ghost btn-sm {% if page >= total_pages %}disabled{% endif %}">Siguiente</a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="app-empty">No hay mensajes en esta bandeja.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Eliminar mensaje</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">Esta accion elimina el mensaje de forma permanente.</p>
+                <p class="soft-text mb-0" id="eliminar-msg-asunto">-</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn app-btn-ghost btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" id="form-eliminar-definitivo">
+                    <input type="hidden" name="carpeta" value="{{ carpeta }}">
+                    <input type="hidden" name="q" value="{{ q }}">
+                    <button class="btn app-btn-danger btn-sm">Eliminar definitivo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("confirmarEliminarModal");
+    const form = document.getElementById("form-eliminar-definitivo");
+    const asuntoEl = document.getElementById("eliminar-msg-asunto");
+    if (!modal || !form || !asuntoEl) return;
+
+    modal.addEventListener("show.bs.modal", function (event) {
+        const btn = event.relatedTarget;
+        if (!btn) return;
+        const id = btn.getAttribute("data-msg-id");
+        const asunto = btn.getAttribute("data-msg-asunto") || "";
+        form.action = "/mensajes/eliminar/" + id;
+        asuntoEl.textContent = "Asunto: " + asunto;
+    });
+});
+</script>
+{% endblock %}

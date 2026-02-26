@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Metas{% endblock %}
+
+{% block content %}
+<section class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3" data-reveal>
+    <div>
+        <p class="eyebrow mb-1">TABLERO PERSONAL</p>
+        <h2 class="mb-0">Mis metas activas</h2>
+    </div>
+    <a href="{{ url_for('metas_bp.inicio_metas') }}" class="btn app-btn-ghost">Crear nueva meta</a>
+</section>
+
+<div class="app-card p-3 p-md-4" data-reveal>
+    <div class="table-responsive d-none d-md-block">
+        <table class="table align-middle app-table mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Meta</th>
+                    <th>Fecha limite</th>
+                    <th style="min-width: 230px;">Progreso</th>
+                    <th>Ahorro diario necesario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in metas %}
+                <tr>
+                    <td>#{{ item.id }}</td>
+                    <td class="fw-semibold">{{ item.meta }}</td>
+                    <td>{{ item.fecha_limite }}</td>
+                    <td>
+                        <div class="progress app-progress" role="progressbar" aria-label="Progreso" aria-valuenow="{{ item.progreso }}" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar app-progress-bar" style="width: {{ item.progreso }}%;">
+                                {{ item.progreso }}%
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="money-chip">${{ item.ahorro_diario }}</span></td>
+                    <td class="d-flex gap-2 flex-wrap">
+                        <a href="{{ url_for('metas_bp.editar', meta_id=item.id) }}" class="btn btn-sm app-btn-warning">Editar</a>
+                        <form method="post" action="{{ url_for('metas_bp.eliminar', meta_id=item.id) }}" onsubmit="return confirm('Eliminar esta meta?');">
+                            <button class="btn btn-sm app-btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4"><div class="app-empty">Aun no tienes metas. Crea la primera desde Inicio.</div></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-grid gap-3 d-md-none">
+        {% for item in metas %}
+            <div class="message-item p-3 border rounded-3 border-light-subtle">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="fw-semibold">{{ item.meta }}</div>
+                    <small class="soft-text">#{{ item.id }}</small>
+                </div>
+                <div class="soft-text small mb-2">Fecha limite: {{ item.fecha_limite }}</div>
+                <div class="progress app-progress mb-2" role="progressbar" aria-label="Progreso" aria-valuenow="{{ item.progreso }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar app-progress-bar" style="width: {{ item.progreso }}%;">
+                        {{ item.progreso }}%
+                    </div>
+                </div>
+                <div class="mb-2"><span class="money-chip">${{ item.ahorro_diario }} / dia</span></div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('metas_bp.editar', meta_id=item.id) }}" class="btn btn-sm app-btn-warning">Editar</a>
+                    <form method="post" action="{{ url_for('metas_bp.eliminar', meta_id=item.id) }}" onsubmit="return confirm('Eliminar esta meta?');">
+                        <button class="btn btn-sm app-btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="app-empty">Aun no tienes metas. Crea la primera desde Inicio.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

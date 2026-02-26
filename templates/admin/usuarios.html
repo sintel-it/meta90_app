@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Usuarios{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">ADMIN</p>
+    <h2 class="mb-0">Usuarios y Roles</h2>
+    <div class="d-flex gap-2 mt-3">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn app-btn-ghost btn-sm">Volver a Dashboard</a>
+    </div>
+</section>
+
+<div class="app-card p-4" data-reveal>
+    <div class="table-responsive">
+        <table class="table align-middle app-table mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Rol</th>
+                    <th>Accion</th>
+                    <th>Permisos modulo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td>{{ u.id }}</td>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.email or '-' }}</td>
+                    <td>{{ u.telefono or '-' }}</td>
+                    <td>
+                        {% if u.rol == 'admin' %}
+                            <span class="status-badge badge-warning">admin</span>
+                        {% elif u.rol == 'lector' %}
+                            <span class="status-badge badge-danger">lector</span>
+                        {% else %}
+                            <span class="status-badge badge-info">editor</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin_actualizar_rol', user_id=u.id) }}" class="d-flex gap-2">
+                            <select name="rol" class="form-select form-select-sm app-input" style="max-width: 120px;">
+                                <option value="editor" {% if u.rol == 'editor' %}selected{% endif %}>editor</option>
+                                <option value="lector" {% if u.rol == 'lector' %}selected{% endif %}>lector</option>
+                                <option value="admin" {% if u.rol == 'admin' %}selected{% endif %}>admin</option>
+                            </select>
+                            <button class="btn app-btn-primary btn-sm">Guardar</button>
+                        </form>
+                    </td>
+                    <td>
+                        <div class="stack-sm">
+                            {% for m in modules_with_perms %}
+                                {% set p = permisos[u.id][m] %}
+                                <form method="post" action="{{ url_for('admin_actualizar_permiso_modulo', user_id=u.id) }}" class="d-flex gap-2 align-items-center">
+                                    <input type="hidden" name="modulo" value="{{ m }}">
+                                    <small style="min-width: 95px;">{{ m }}</small>
+                                    <label class="small"><input type="checkbox" name="can_view" value="1" {% if p.view %}checked{% endif %}> ver</label>
+                                    <label class="small"><input type="checkbox" name="can_edit" value="1" {% if p.edit %}checked{% endif %}> editar</label>
+                                    <button class="btn app-btn-ghost btn-sm py-0 px-2">OK</button>
+                                </form>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center py-4"><div class="app-empty">Sin usuarios.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

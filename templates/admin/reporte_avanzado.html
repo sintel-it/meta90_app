@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte Avanzado{% endblock %}
+
+{% block content %}
+<section class="mb-4" data-reveal>
+    <p class="eyebrow mb-1">ADMIN</p>
+    <h2 class="mb-0">Reporte Avanzado</h2>
+    <div class="d-flex gap-2 mt-3">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn app-btn-ghost btn-sm">Volver</a>
+    </div>
+</section>
+
+<div class="app-card p-4" data-reveal>
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-3"><label class="form-label">Desde</label><input type="date" name="fecha_desde" value="{{ data.desde }}" class="form-control app-input"></div>
+        <div class="col-md-3"><label class="form-label">Hasta</label><input type="date" name="fecha_hasta" value="{{ data.hasta }}" class="form-control app-input"></div>
+        <div class="col-md-2 d-flex align-items-end"><button class="btn app-btn-primary w-100">Aplicar</button></div>
+        <div class="col-md-4 d-flex align-items-end gap-2">
+            <a class="btn app-btn-success w-100" href="{{ url_for('admin_reporte_avanzado_csv', fecha_desde=data.desde, fecha_hasta=data.hasta) }}">CSV</a>
+            <a class="btn app-btn-warning w-100" href="{{ url_for('admin_reporte_avanzado_pdf', fecha_desde=data.desde, fecha_hasta=data.hasta) }}">PDF</a>
+        </div>
+    </form>
+
+    <div class="row g-2 mb-3">
+        <div class="col-6 col-md-3"><div class="p-3 border rounded-3 border-light-subtle"><small class="soft-text d-block">Eventos auditoria</small><strong>{{ data.total }}</strong></div></div>
+        <div class="col-6 col-md-3"><div class="p-3 border rounded-3 border-light-subtle"><small class="soft-text d-block">Login fallidos</small><strong>{{ data.login_fail }}</strong></div></div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle app-table mb-0">
+            <thead><tr><th>Modulo</th><th>Accion</th><th>Total</th></tr></thead>
+            <tbody>
+                {% for r in data.rows %}
+                <tr><td>{{ r.modulo }}</td><td>{{ r.accion }}</td><td>{{ r.total }}</td></tr>
+                {% else %}
+                <tr><td colspan="3" class="text-center py-3"><div class="app-empty">Sin datos en el rango.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
