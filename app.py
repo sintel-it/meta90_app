@@ -5091,6 +5091,16 @@ def mobile_client():
     return render_template("mobile/client.html")
 
 
+@app.get("/privacy")
+def privacy_policy():
+    return render_template("legal/privacy.html")
+
+
+@app.get("/data-deletion")
+def data_deletion():
+    return render_template("legal/data_deletion.html")
+
+
 @app.post("/admin/notificaciones/ejecutar")
 def admin_ejecutar_notificaciones():
     guard = _admin_guard()
