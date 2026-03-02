@@ -589,6 +589,107 @@ body.app-loading .app-panel::before {
     }
 }
 
+@media (min-width: 992px) {
+    body {
+        padding-left: 236px;
+    }
+
+    .app-nav {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 220px;
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+        background: linear-gradient(180deg, rgba(44, 52, 110, 0.96), rgba(39, 49, 105, 0.94));
+    }
+
+    .app-nav::after {
+        display: none;
+    }
+
+    .app-nav .container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch !important;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .app-brand {
+        padding: 0.35rem 0.2rem 0.7rem;
+    }
+
+    .app-top-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch !important;
+        justify-content: flex-start;
+        gap: 0.7rem !important;
+        width: 100%;
+        min-height: 0;
+        flex: 1;
+    }
+
+    .app-global-search {
+        display: none !important;
+    }
+
+    .app-main-links {
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        border-radius: 0;
+    }
+
+    .app-nav-link {
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 0.52rem 0.65rem;
+        font-weight: 600;
+        font-size: 1.05rem;
+    }
+
+    .app-nav-link.is-active {
+        background: rgba(116, 142, 255, 0.55);
+        border-color: rgba(133, 157, 255, 0.75);
+        box-shadow: none;
+    }
+
+    .app-user-actions {
+        margin-left: 0;
+        margin-top: auto;
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        border-radius: 0;
+    }
+
+    .app-user-actions .app-mini-icon {
+        display: none !important;
+    }
+
+    .app-user-actions .app-user-chip {
+        order: -2;
+        justify-self: start;
+    }
+
+    .app-user-actions .btn {
+        width: 100%;
+    }
+}
+
 .calendar-grid-header,
 .calendar-grid-body {
     display: grid;
