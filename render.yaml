@@ -7,7 +7,9 @@ services:
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.13.0
+        value: 3.14.3
+      - key: APP_ENV
+        value: production
       - key: FLASK_DEBUG
         value: "0"
       - key: COOKIE_SECURE
@@ -21,4 +23,6 @@ services:
       - key: NOTIFICATIONS_FORCE_EACH_RUN
         value: "0"
       - key: DB_PATH
-        value: /var/data/metas.db
+        value: metas.db
+      - key: GOOGLE_REDIRECT_URI
+        value: ""
