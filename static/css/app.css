@@ -825,6 +825,11 @@ body.compact-ui .kpi-strip {
     letter-spacing: 0.02em;
 }
 
+.planner-side .kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
 .login-account-chooser {
     position: relative;
     overflow: hidden;

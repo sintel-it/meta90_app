@@ -17,12 +17,17 @@
                 <button type="button" class="btn app-btn-ghost btn-sm">Semana</button>
                 <button type="button" class="btn app-btn-ghost btn-sm">Mes</button>
             </div>
-            <h6 class="mb-3">Modulos</h6>
-            <div class="d-grid gap-2">
-                <a href="{{ url_for('metas_bp.ver_metas') }}" class="btn app-btn-ghost btn-sm text-start">Metas</a>
-                <a href="{{ url_for('calendario_bp.calendario') }}" class="btn app-btn-ghost btn-sm text-start">Calendario</a>
-                <a href="{{ url_for('mensajes_bp.mensajes') }}" class="btn app-btn-ghost btn-sm text-start">Mensajes</a>
-                <a href="{{ url_for('notificaciones_bp.notificaciones') }}" class="btn app-btn-ghost btn-sm text-start">Notificaciones</a>
+            <h6 class="mb-2">Resumen del dia</h6>
+            <p class="soft-text mb-2">Consulta tus indicadores y crea metas desde el panel principal.</p>
+            <div class="kpi-strip">
+                <div class="kpi-item">
+                    <small class="soft-text">Metas</small>
+                    <strong>{{ kpis.metas_total }}</strong>
+                </div>
+                <div class="kpi-item">
+                    <small class="soft-text">Alertas</small>
+                    <strong>{{ kpis.alertas_total }}</strong>
+                </div>
             </div>
         </div>
     </div>
@@ -32,12 +37,10 @@
             <div class="col-lg-8" data-reveal>
                 <div class="app-card p-4">
                     <h4 class="mb-2">Accesos rapidos</h4>
-                    <p class="soft-text mb-3">Usa una accion principal y accesos secundarios para navegar mas rapido.</p>
+                    <p class="soft-text mb-3">Accion principal del dia y estado general de tu avance.</p>
                     <div class="d-flex flex-wrap gap-2 mb-3">
                         <a href="{{ url_for('metas_bp.ver_metas') }}" class="btn app-btn-primary">Ver metas activas</a>
-                        <a href="{{ url_for('calendario_bp.calendario') }}" class="btn app-btn-ghost">Calendario</a>
-                        <a href="{{ url_for('mensajes_bp.mensajes') }}" class="btn app-btn-ghost">Mensajes</a>
-                        <a href="{{ url_for('notificaciones_bp.notificaciones') }}" class="btn app-btn-ghost">Notificaciones</a>
+                        <a href="#nueva-meta-panel" class="btn app-btn-ghost">Crear nueva meta</a>
                     </div>
                     <div class="kpi-strip">
                         <div class="kpi-item">
@@ -60,7 +63,7 @@
                 </div>
             </div>
             <div class="col-lg-4" data-reveal>
-                <div class="app-card p-4 h-100">
+                <div class="app-card p-4 h-100" id="nueva-meta-panel">
                     <h4 class="mb-3">Nueva meta</h4>
                     <form action="{{ url_for('metas_bp.crear_meta') }}" method="post" class="stack-sm">
                         <div>
