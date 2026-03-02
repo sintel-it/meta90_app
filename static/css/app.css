@@ -237,22 +237,17 @@ body.module-perfil {
     background: rgba(255, 255, 255, 0.03);
 }
 
-.app-secondary-menu .dropdown-menu {
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(183, 206, 255, 0.24);
-    background: rgba(6, 16, 31, 0.96);
-    backdrop-filter: blur(8px);
-    min-width: 11rem;
+.app-mini-btn {
+    padding-inline: 0.62rem !important;
 }
 
-.app-secondary-menu .dropdown-item {
-    color: #e8f4ff;
-    font-size: 0.92rem;
-}
-
-.app-secondary-menu .dropdown-item:hover {
-    background: rgba(149, 240, 217, 0.12);
-    color: #fff;
+.app-mini-icon {
+    width: 32px;
+    min-width: 32px;
+    padding-inline: 0 !important;
+    text-align: center;
+    font-size: 1rem !important;
+    line-height: 1.05;
 }
 
 .app-pill-btn.btn,
