@@ -151,6 +151,13 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="col-12">
+                            <h6>Diagnostico de configuracion</h6>
+                            <div class="d-flex gap-2 flex-wrap mb-2">
+                                <button type="button" id="admin-config-check-btn" class="btn app-btn-ghost btn-sm">Ejecutar diagnostico</button>
+                            </div>
+                            <pre id="admin-config-check-result" class="mb-0 p-3 rounded-3 border border-light-subtle soft-text" hidden></pre>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -203,6 +210,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     refreshSemaforo();
     setInterval(refreshSemaforo, 60000);
+
+    const diagBtn = document.getElementById("admin-config-check-btn");
+    const diagOut = document.getElementById("admin-config-check-result");
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
+    if (diagBtn && diagOut) {
+        diagBtn.addEventListener("click", async function () {
+            diagBtn.disabled = true;
+            diagOut.hidden = false;
+            diagOut.textContent = "Ejecutando diagnostico...";
+            try {
+                const res = await fetch("{{ url_for('admin_diagnostico_config') }}", {
+                    method: "POST",
+                    headers: { "X-CSRF-Token": csrf, "Accept": "application/json" },
+                    credentials: "same-origin",
+                });
+                const data = await res.json();
+                const status = data.ok ? "OK" : "ERROR";
+                let text = `[${status}] ${data.timestamp || ""}\n`;
+                if (data.stdout) text += `\n${data.stdout}\n`;
+                if (data.stderr) text += `\nSTDERR:\n${data.stderr}\n`;
+                if (!data.stdout && !data.stderr && data.error) text += `\n${data.error}\n`;
+                diagOut.textContent = text.trim();
+            } catch (err) {
+                diagOut.textContent = "No se pudo ejecutar el diagnostico: " + err.message;
+            } finally {
+                diagBtn.disabled = false;
+            }
+        });
+    }
 });
 </script>
 {% endblock %}

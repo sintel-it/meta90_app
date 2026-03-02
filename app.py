@@ -4506,6 +4506,46 @@ def admin_reporte_diario_status():
     return jsonify(_resumen_reporte_diario())
 
 
+@app.post("/admin/diagnostico/config")
+def admin_diagnostico_config():
+    guard = _admin_guard()
+    if guard is not None:
+        return guard
+    rate = _admin_rate_guard()
+    if rate:
+        return rate
+
+    py = os.path.join(BASE_DIR, "venv", "Scripts", "python.exe")
+    if not os.path.exists(py):
+        py = sys.executable
+    script = os.path.join(BASE_DIR, "scripts", "preflight_oauth_and_env.py")
+
+    try:
+        proc = subprocess.run(
+            [py, script],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+            cwd=BASE_DIR,
+            env=os.environ.copy(),
+        )
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"ok": False, "status": "error", "error": str(exc)}), 500
+
+    stdout = (proc.stdout or "").strip()
+    stderr = (proc.stderr or "").strip()
+    payload = {
+        "ok": proc.returncode == 0,
+        "status": "ok" if proc.returncode == 0 else "error",
+        "returncode": proc.returncode,
+        "stdout": stdout,
+        "stderr": stderr,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    return jsonify(payload), (200 if proc.returncode == 0 else 409)
+
+
 @app.post("/admin/audit/filtros/guardar")
 def admin_guardar_filtro_auditoria():
     guard = _admin_guard()
