@@ -71,7 +71,7 @@
     <div class="col-lg-6" data-reveal>
         <div class="app-card p-4 h-100">
             <h5 class="mb-3">Metas recientes</h5>
-            <div class="d-grid gap-2">
+            <div class="d-grid gap-2 home-list">
                 {% for m in metas_recientes %}
                     <div class="message-item rounded-3">
                         <div class="fw-semibold">{{ m.meta }}</div>
@@ -86,7 +86,7 @@
     <div class="col-lg-6" data-reveal>
         <div class="app-card p-4 h-100">
             <h5 class="mb-3">Eventos proximos</h5>
-            <div class="d-grid gap-2">
+            <div class="d-grid gap-2 home-list">
                 {% for e in eventos_proximos %}
                     <div class="message-item rounded-3">
                         <div class="fw-semibold">{{ e.titulo }}</div>

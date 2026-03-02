@@ -148,11 +148,11 @@ body.module-perfil {
 
 .app-user-chip {
     color: var(--text-main);
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--line);
-    padding: 0.25rem 0.7rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(183, 206, 255, 0.14);
+    padding: 0.22rem 0.62rem;
     border-radius: 999px;
-    font-size: 0.92rem;
+    font-size: 0.88rem;
 }
 
 .app-pill-btn {
@@ -163,11 +163,11 @@ body.module-perfil {
     flex-wrap: wrap;
     justify-content: flex-end;
     width: 100%;
-    gap: var(--space-2) !important;
+    gap: 0.6rem !important;
 }
 
 .app-main-links {
-    gap: var(--space-3);
+    gap: 0.55rem;
     padding: 0.2rem;
     border: 1px solid rgba(183, 206, 255, 0.18);
     border-radius: 999px;
@@ -209,7 +209,7 @@ body.module-perfil {
     text-decoration: none;
     font-size: 0.92rem;
     font-weight: 600;
-    padding: 0.36rem 0.7rem;
+    padding: 0.33rem 0.62rem;
     border: 1px solid transparent;
     border-radius: 999px;
     transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
@@ -230,7 +230,7 @@ body.module-perfil {
 
 .app-user-actions {
     margin-left: auto;
-    gap: 0.5rem;
+    gap: 0.38rem;
     padding: 0.2rem;
     border-radius: 999px;
     border: 1px solid rgba(183, 206, 255, 0.18);
@@ -369,7 +369,12 @@ body.app-loading .app-panel::before {
 
 .stack-sm {
     display: grid;
-    gap: var(--space-3);
+    gap: 1.1rem;
+}
+
+.stack-sm > div {
+    display: grid;
+    gap: 0.34rem;
 }
 
 .app-input {
@@ -404,7 +409,7 @@ body.app-loading .app-panel::before {
     color: #e7f1ff;
     font-weight: 600;
     font-size: 0.92rem;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0;
 }
 
 .app-btn-primary,
@@ -665,7 +670,12 @@ body.app-loading .app-panel::before {
 .message-item {
     background: rgba(5, 14, 29, 0.42);
     border-color: rgba(183, 206, 255, 0.18) !important;
-    padding: 0.95rem !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.9rem 0.95rem !important;
+    min-height: 78px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .message-avatar {
@@ -807,6 +817,10 @@ body.compact-ui .kpi-strip {
     text-align: center;
 }
 
+.home-list .message-item .soft-text {
+    line-height: 1.3;
+}
+
 .login-account-chooser {
     position: relative;
     overflow: hidden;
@@ -929,7 +943,7 @@ body.compact-ui .kpi-strip {
         width: 100%;
         flex-wrap: wrap;
         gap: 0.4rem;
-        border-radius: 14px;
+        border-radius: var(--radius-md);
     }
 
     .kpi-strip {
@@ -938,6 +952,10 @@ body.compact-ui .kpi-strip {
 
     .app-user-chip {
         order: 3;
+    }
+
+    .stack-sm .btn.app-btn-primary {
+        width: 100%;
     }
 
     .message-actions {
