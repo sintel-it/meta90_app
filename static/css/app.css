@@ -237,10 +237,6 @@ body.module-perfil {
     background: rgba(255, 255, 255, 0.03);
 }
 
-.app-mini-btn {
-    padding-inline: 0.62rem !important;
-}
-
 .app-mini-icon {
     width: 32px;
     min-width: 32px;
