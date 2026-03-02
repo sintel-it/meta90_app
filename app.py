@@ -19,6 +19,7 @@ from urllib import request as urlrequest
 
 from flask import Flask, Response, abort, flash, has_request_context, jsonify, make_response, redirect, render_template, request, session, url_for
 from itsdangerous import BadSignature, URLSafeSerializer
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from migrations import apply_migrations
@@ -57,15 +58,22 @@ cargar_env_local(os.path.join(BASE_DIR, ".env"))
 MAINTENANCE_NOTIFICATIONS_FLAG = os.path.join(BASE_DIR, "logs", "maintenance_notificaciones.flag")
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "").strip() or secrets.token_hex(32)
+APP_ENV = os.getenv("APP_ENV", "").strip().lower()
+IS_PROD = APP_ENV in ("prod", "production") or bool(os.getenv("RENDER"))
+_secret_from_env = os.getenv("FLASK_SECRET_KEY", "").strip() or os.getenv("SECRET_KEY", "").strip()
+app.secret_key = _secret_from_env or secrets.token_hex(32)
+if IS_PROD and not _secret_from_env:
+    print("WARN: SECRET_KEY/FLASK_SECRET_KEY no definido en produccion; se usa clave temporal.", file=sys.stderr)
 SESSION_DAYS = max(1, int(os.getenv("SESSION_DAYS", "30")))
 REMEMBER_ME_DAYS = max(1, int(os.getenv("REMEMBER_ME_DAYS", "90")))
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "0").strip() in ("1", "true", "True")
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "1" if IS_PROD else "0").strip() in ("1", "true", "True")
 COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "Lax").strip() or "Lax"
 app.permanent_session_lifetime = timedelta(days=SESSION_DAYS)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = COOKIE_SECURE
 app.config["SESSION_COOKIE_SAMESITE"] = COOKIE_SAMESITE
+# Render/Reverse proxy support for correct scheme/host on OAuth callbacks.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 DB_PATH = os.getenv("DB_PATH", "").strip() or os.path.join(BASE_DIR, "metas.db")
 BACKUP_DIR = os.getenv("BACKUP_DIR", "").strip() or os.path.join(BASE_DIR, "backups")
 
@@ -1666,6 +1674,16 @@ def validar_permiso_modulo():
         return jsonify({"ok": False, "error": "forbidden", "detail": "Permiso insuficiente."}), 403
     flash("No tienes permiso para acceder a este modulo.", "warning")
     return redirect(url_for("metas_bp.inicio_metas"))
+
+
+@app.after_request
+def aplicar_headers_seguridad(response):
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    if request.is_secure:
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
 
 
 def smtp_configurado():
