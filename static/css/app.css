@@ -821,6 +821,10 @@ body.compact-ui .kpi-strip {
     line-height: 1.3;
 }
 
+.planner-side h6 {
+    letter-spacing: 0.02em;
+}
+
 .login-account-chooser {
     position: relative;
     overflow: hidden;

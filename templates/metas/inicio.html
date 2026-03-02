@@ -8,95 +8,117 @@
     <h2 class="mb-0">Resumen ejecutivo</h2>
 </section>
 
-<section class="row g-4 mb-4">
-    <div class="col-lg-8" data-reveal>
-        <div class="app-card p-4">
-            <h4 class="mb-2">Accesos rapidos</h4>
-            <p class="soft-text mb-3">Usa una accion principal y accesos secundarios para navegar mas rapido.</p>
-            <div class="d-flex flex-wrap gap-2 mb-3">
-                <a href="{{ url_for('metas_bp.ver_metas') }}" class="btn app-btn-primary">Ver metas activas</a>
-                <a href="{{ url_for('calendario_bp.calendario') }}" class="btn app-btn-ghost">Calendario</a>
-                <a href="{{ url_for('mensajes_bp.mensajes') }}" class="btn app-btn-ghost">Mensajes</a>
-                <a href="{{ url_for('notificaciones_bp.notificaciones') }}" class="btn app-btn-ghost">Notificaciones</a>
-            </div>
-            <div class="kpi-strip">
-                <div class="kpi-item">
-                    <small class="soft-text">Metas</small>
-                    <strong>{{ kpis.metas_total }}</strong>
-                </div>
-                <div class="kpi-item">
-                    <small class="soft-text">Eventos hoy</small>
-                    <strong>{{ kpis.eventos_hoy }}</strong>
-                </div>
-                <div class="kpi-item">
-                    <small class="soft-text">Sin leer</small>
-                    <strong>{{ kpis.mensajes_no_leidos }}</strong>
-                </div>
-                <div class="kpi-item">
-                    <small class="soft-text">Alertas</small>
-                    <strong>{{ kpis.alertas_total }}</strong>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4" data-reveal>
-        <div class="app-card p-4 h-100">
-            <h4 class="mb-3">Nueva meta</h4>
-            <form action="{{ url_for('metas_bp.crear_meta') }}" method="post" class="stack-sm">
-                <div>
-                    <label class="form-label">Meta</label>
-                    <input type="text" name="meta" class="form-control app-input" required>
-                </div>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <label class="form-label">Monto</label>
-                        <input type="number" step="0.01" min="0" name="monto" class="form-control app-input" required>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label">Ahorrado</label>
-                        <input type="number" step="0.01" min="0" name="ahorrado" class="form-control app-input" required>
-                    </div>
-                </div>
-                <div>
-                    <label class="form-label">Fecha limite</label>
-                    <input type="date" name="fecha_limite" class="form-control app-input" required>
-                </div>
-                <button class="btn app-btn-primary">Crear meta</button>
-            </form>
-        </div>
-    </div>
-</section>
-
 <section class="row g-4">
-    <div class="col-lg-6" data-reveal>
-        <div class="app-card p-4 h-100">
-            <h5 class="mb-3">Metas recientes</h5>
-            <div class="d-grid gap-2 home-list">
-                {% for m in metas_recientes %}
-                    <div class="message-item rounded-3">
-                        <div class="fw-semibold">{{ m.meta }}</div>
-                        <small class="soft-text">{{ m.fecha_limite }} | ${{ '%.2f'|format(m.ahorrado) }} / ${{ '%.2f'|format(m.monto) }}</small>
-                    </div>
-                {% else %}
-                    <div class="app-empty">Sin metas registradas.</div>
-                {% endfor %}
+    <div class="col-xl-3" data-reveal>
+        <div class="app-card p-3 p-md-4 planner-side h-100">
+            <h6 class="mb-3">Vista</h6>
+            <div class="d-grid gap-2 mb-4">
+                <button type="button" class="btn app-btn-primary btn-sm">Hoy</button>
+                <button type="button" class="btn app-btn-ghost btn-sm">Semana</button>
+                <button type="button" class="btn app-btn-ghost btn-sm">Mes</button>
+            </div>
+            <h6 class="mb-3">Modulos</h6>
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('metas_bp.ver_metas') }}" class="btn app-btn-ghost btn-sm text-start">Metas</a>
+                <a href="{{ url_for('calendario_bp.calendario') }}" class="btn app-btn-ghost btn-sm text-start">Calendario</a>
+                <a href="{{ url_for('mensajes_bp.mensajes') }}" class="btn app-btn-ghost btn-sm text-start">Mensajes</a>
+                <a href="{{ url_for('notificaciones_bp.notificaciones') }}" class="btn app-btn-ghost btn-sm text-start">Notificaciones</a>
             </div>
         </div>
     </div>
-    <div class="col-lg-6" data-reveal>
-        <div class="app-card p-4 h-100">
-            <h5 class="mb-3">Eventos proximos</h5>
-            <div class="d-grid gap-2 home-list">
-                {% for e in eventos_proximos %}
-                    <div class="message-item rounded-3">
-                        <div class="fw-semibold">{{ e.titulo }}</div>
-                        <small class="soft-text">{{ e.fecha_evento }}{% if e.hora_evento %} {{ e.hora_evento }}{% endif %}</small>
+
+    <div class="col-xl-9">
+        <section class="row g-4 mb-4">
+            <div class="col-lg-8" data-reveal>
+                <div class="app-card p-4">
+                    <h4 class="mb-2">Accesos rapidos</h4>
+                    <p class="soft-text mb-3">Usa una accion principal y accesos secundarios para navegar mas rapido.</p>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <a href="{{ url_for('metas_bp.ver_metas') }}" class="btn app-btn-primary">Ver metas activas</a>
+                        <a href="{{ url_for('calendario_bp.calendario') }}" class="btn app-btn-ghost">Calendario</a>
+                        <a href="{{ url_for('mensajes_bp.mensajes') }}" class="btn app-btn-ghost">Mensajes</a>
+                        <a href="{{ url_for('notificaciones_bp.notificaciones') }}" class="btn app-btn-ghost">Notificaciones</a>
                     </div>
-                {% else %}
-                    <div class="app-empty">Sin eventos proximos.</div>
-                {% endfor %}
+                    <div class="kpi-strip">
+                        <div class="kpi-item">
+                            <small class="soft-text">Metas</small>
+                            <strong>{{ kpis.metas_total }}</strong>
+                        </div>
+                        <div class="kpi-item">
+                            <small class="soft-text">Eventos hoy</small>
+                            <strong>{{ kpis.eventos_hoy }}</strong>
+                        </div>
+                        <div class="kpi-item">
+                            <small class="soft-text">Sin leer</small>
+                            <strong>{{ kpis.mensajes_no_leidos }}</strong>
+                        </div>
+                        <div class="kpi-item">
+                            <small class="soft-text">Alertas</small>
+                            <strong>{{ kpis.alertas_total }}</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+            <div class="col-lg-4" data-reveal>
+                <div class="app-card p-4 h-100">
+                    <h4 class="mb-3">Nueva meta</h4>
+                    <form action="{{ url_for('metas_bp.crear_meta') }}" method="post" class="stack-sm">
+                        <div>
+                            <label class="form-label">Meta</label>
+                            <input type="text" name="meta" class="form-control app-input" required>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label">Monto</label>
+                                <input type="number" step="0.01" min="0" name="monto" class="form-control app-input" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Ahorrado</label>
+                                <input type="number" step="0.01" min="0" name="ahorrado" class="form-control app-input" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Fecha limite</label>
+                            <input type="date" name="fecha_limite" class="form-control app-input" required>
+                        </div>
+                        <button class="btn app-btn-primary">Crear meta</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="row g-4">
+            <div class="col-lg-6" data-reveal>
+                <div class="app-card p-4 h-100">
+                    <h5 class="mb-3">Metas recientes</h5>
+                    <div class="d-grid gap-2 home-list">
+                        {% for m in metas_recientes %}
+                            <div class="message-item rounded-3">
+                                <div class="fw-semibold">{{ m.meta }}</div>
+                                <small class="soft-text">{{ m.fecha_limite }} | ${{ '%.2f'|format(m.ahorrado) }} / ${{ '%.2f'|format(m.monto) }}</small>
+                            </div>
+                        {% else %}
+                            <div class="app-empty">Sin metas registradas.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-reveal>
+                <div class="app-card p-4 h-100">
+                    <h5 class="mb-3">Eventos proximos</h5>
+                    <div class="d-grid gap-2 home-list">
+                        {% for e in eventos_proximos %}
+                            <div class="message-item rounded-3">
+                                <div class="fw-semibold">{{ e.titulo }}</div>
+                                <small class="soft-text">{{ e.fecha_evento }}{% if e.hora_evento %} {{ e.hora_evento }}{% endif %}</small>
+                            </div>
+                        {% else %}
+                            <div class="app-empty">Sin eventos proximos.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </section>
 {% endblock %}
