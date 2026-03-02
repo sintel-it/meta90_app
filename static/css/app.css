@@ -212,7 +212,16 @@ body.module-perfil {
     padding: 0.33rem 0.62rem;
     border: 1px solid transparent;
     border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.app-nav-icon {
+    width: 1rem;
+    text-align: center;
+    opacity: 0.9;
 }
 
 .app-nav-link:hover {
@@ -650,16 +659,16 @@ body.app-loading .app-panel::before {
     }
 
     .app-nav-link {
-        border-radius: 8px;
+        border-radius: 10px;
         border: 1px solid transparent;
-        padding: 0.52rem 0.65rem;
+        padding: 0.58rem 0.7rem;
         font-weight: 600;
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
 
     .app-nav-link.is-active {
-        background: rgba(116, 142, 255, 0.55);
-        border-color: rgba(133, 157, 255, 0.75);
+        background: rgba(116, 142, 255, 0.45);
+        border-color: rgba(133, 157, 255, 0.72);
         box-shadow: none;
     }
 
