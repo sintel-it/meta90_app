@@ -473,6 +473,17 @@ body.app-loading .app-panel::before {
     color: #ecf5ff;
     margin: 0;
     font-size: 0.92rem;
+    --bs-table-bg: transparent;
+    --bs-table-color: #ecf5ff;
+    --bs-table-border-color: rgba(183, 206, 255, 0.12);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-striped-color: #ecf5ff;
+    --bs-table-hover-bg: rgba(149, 240, 217, 0.08);
+    --bs-table-hover-color: #ffffff;
+}
+
+.app-table > :not(caption) > * > * {
+    background-color: transparent;
 }
 
 .app-table thead th {
