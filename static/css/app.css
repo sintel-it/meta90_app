@@ -18,8 +18,8 @@
     --space-3: 1rem;
     --space-4: 1.5rem;
     --space-5: 2rem;
-    --radius-md: 14px;
-    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
 }
 
 * {
@@ -152,11 +152,11 @@ body.module-perfil {
     border: 1px solid var(--line);
     padding: 0.25rem 0.7rem;
     border-radius: 999px;
-    font-size: 0.83rem;
+    font-size: 0.92rem;
 }
 
 .app-pill-btn {
-    border-radius: 10px;
+    border-radius: var(--radius-md);
 }
 
 .app-top-actions {
@@ -207,7 +207,7 @@ body.module-perfil {
 .app-nav-link {
     color: #dcecff;
     text-decoration: none;
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     font-weight: 600;
     padding: 0.36rem 0.7rem;
     border: 1px solid transparent;
@@ -237,12 +237,30 @@ body.module-perfil {
     background: rgba(255, 255, 255, 0.03);
 }
 
+.app-secondary-menu .dropdown-menu {
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(183, 206, 255, 0.24);
+    background: rgba(6, 16, 31, 0.96);
+    backdrop-filter: blur(8px);
+    min-width: 11rem;
+}
+
+.app-secondary-menu .dropdown-item {
+    color: #e8f4ff;
+    font-size: 0.92rem;
+}
+
+.app-secondary-menu .dropdown-item:hover {
+    background: rgba(149, 240, 217, 0.12);
+    color: #fff;
+}
+
 .app-pill-btn.btn,
 .app-pill-btn.btn-outline-light {
     border: 1px solid rgba(198, 220, 255, 0.25) !important;
     background: rgba(255, 255, 255, 0.03) !important;
     color: #e7f3ff !important;
-    font-size: 0.8rem;
+    font-size: 0.92rem;
     line-height: 1.1;
     padding: 0.35rem 0.62rem;
     box-shadow: none !important;
@@ -257,7 +275,29 @@ body.module-perfil {
 }
 
 .app-alert {
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    color: var(--text-main);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    padding: 0.75rem 0.9rem;
+}
+
+.app-alert.alert-success {
+    border-color: rgba(37, 208, 166, 0.5);
+}
+
+.app-alert.alert-warning {
+    border-color: rgba(255, 201, 91, 0.5);
+}
+
+.app-alert.alert-danger {
+    border-color: rgba(255, 108, 112, 0.58);
+}
+
+.app-alert .btn-close {
+    filter: invert(1) brightness(1.2);
 }
 
 .app-card,
@@ -314,7 +354,7 @@ body.app-loading .app-panel::before {
 
 .eyebrow {
     margin-bottom: 0.6rem;
-    font-size: 0.76rem;
+    font-size: 0.92rem;
     letter-spacing: 0.18em;
     color: var(--text-soft);
     text-transform: uppercase;
@@ -333,6 +373,7 @@ body.app-loading .app-panel::before {
 .hero-copy,
 .soft-text {
     color: var(--text-soft);
+    font-size: 0.92rem;
 }
 
 .stack-sm {
@@ -371,7 +412,7 @@ body.app-loading .app-panel::before {
 .form-label {
     color: #e7f1ff;
     font-weight: 600;
-    font-size: 0.86rem;
+    font-size: 0.92rem;
     margin-bottom: 0.35rem;
 }
 
@@ -380,22 +421,24 @@ body.app-loading .app-panel::before {
 .app-btn-ghost,
 .app-btn-warning,
 .app-btn-danger {
-    border: 0;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-weight: 600;
+    font-size: 0.92rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     min-height: 38px;
     padding: 0.4rem 0.85rem;
 }
 
 .app-btn-primary {
+    border: 0;
     color: #071126;
     background: linear-gradient(130deg, var(--accent), #ffd281);
 }
 
 .app-btn-success {
-    color: #041e19;
-    background: linear-gradient(130deg, var(--accent-alt), #95f0d9);
+    color: #e8f4ff;
+    border: 1px solid rgba(198, 220, 255, 0.35);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .app-btn-ghost {
@@ -405,13 +448,15 @@ body.app-loading .app-panel::before {
 }
 
 .app-btn-warning {
-    color: #071126;
-    background: linear-gradient(130deg, var(--warning), #ffe09b);
+    color: #e8f4ff;
+    border: 1px solid rgba(198, 220, 255, 0.35);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .app-btn-danger {
-    color: #fff;
-    background: linear-gradient(130deg, #ff7f84, var(--danger));
+    color: #ffd7da;
+    border: 1px solid rgba(255, 108, 112, 0.55);
+    background: rgba(255, 108, 112, 0.13);
 }
 
 .app-btn-primary:hover,
@@ -442,7 +487,7 @@ body.app-loading .app-panel::before {
 .app-table thead th {
     border-bottom: 1px solid var(--line);
     color: #d4e6ff;
-    font-size: 0.83rem;
+    font-size: 0.92rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     position: sticky;
@@ -724,7 +769,7 @@ body.compact-ui {
 
 body.compact-ui .app-card,
 body.compact-ui .app-panel {
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
 }
 
 body.compact-ui .app-card.p-4,
@@ -792,7 +837,7 @@ body.compact-ui .kpi-strip {
     background: rgba(6, 16, 31, 0.56);
     border: 1px solid rgba(183, 206, 255, 0.24);
     color: #eaf3ff;
-    border-radius: 14px !important;
+    border-radius: 12px !important;
     margin-bottom: 0.58rem;
     padding: 0.72rem 0.82rem;
 }
@@ -809,7 +854,7 @@ body.compact-ui .kpi-strip {
 .login-add-account {
     padding-top: 0.66rem;
     padding-bottom: 0.66rem;
-    border-radius: 14px;
+    border-radius: 12px;
 }
 
 .login-account-close {
