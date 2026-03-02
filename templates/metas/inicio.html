@@ -68,7 +68,7 @@
 </section>
 
 <section class="row g-4">
-    <div class="col-lg-4" data-reveal>
+    <div class="col-lg-6" data-reveal>
         <div class="app-card p-4 h-100">
             <h5 class="mb-3">Metas recientes</h5>
             <div class="d-grid gap-2">
@@ -83,7 +83,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4" data-reveal>
+    <div class="col-lg-6" data-reveal>
         <div class="app-card p-4 h-100">
             <h5 class="mb-3">Eventos proximos</h5>
             <div class="d-grid gap-2">
@@ -94,24 +94,6 @@
                     </div>
                 {% else %}
                     <div class="app-empty">Sin eventos proximos.</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4" data-reveal>
-        <div class="app-card p-4 h-100">
-            <h5 class="mb-3">Timeline de actividad</h5>
-            <div class="timeline-list">
-                {% for a in actividad_reciente %}
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div>
-                            <div class="fw-semibold">{{ a.modulo }} · {{ a.accion }} · {{ a.entidad }}</div>
-                            <small class="soft-text">{{ a.creado_en }}</small>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="app-empty">Sin actividad reciente.</div>
                 {% endfor %}
             </div>
         </div>
