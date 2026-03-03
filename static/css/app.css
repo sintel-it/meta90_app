@@ -943,6 +943,18 @@ body.compact-ui .kpi-strip {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 24px rgba(0, 0, 0, 0.28), 0 0 0 3px rgba(132, 208, 255, 0.08) !important;
 }
 
+.login-layout .hero-copy {
+    max-width: 42ch;
+}
+
+.login-hints {
+    border-radius: var(--radius-md);
+}
+
+.login-hints .soft-text {
+    font-size: 0.9rem;
+}
+
 .login-account-chooser::before {
     content: "";
     position: absolute;
@@ -994,7 +1006,7 @@ body.compact-ui .kpi-strip {
 }
 
 .login-title {
-    margin-bottom: 1.25rem !important;
+    margin-bottom: 0 !important;
 }
 
 .login-card .app-input {
@@ -1011,6 +1023,27 @@ body.compact-ui .kpi-strip {
 .login-card .form-check {
     margin-top: 0.2rem;
     margin-bottom: 0.35rem;
+}
+
+.login-divider {
+    position: relative;
+    text-align: center;
+}
+
+.login-divider::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgba(183, 206, 255, 0.2);
+}
+
+.login-divider span {
+    position: relative;
+    padding: 0 0.55rem;
+    background: rgba(8, 18, 35, 0.65);
 }
 
 @media (max-width: 991px) {
