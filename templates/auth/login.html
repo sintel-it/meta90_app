@@ -5,14 +5,25 @@
 {% block content %}
 <section class="row justify-content-center align-items-stretch g-4 login-layout">
     <div class="col-lg-5" data-reveal>
-        <p class="eyebrow">PLANIFICACION INTELIGENTE</p>
-        <h1 class="hero-title">Convierte metas en logros medibles</h1>
-        <p class="hero-copy">Administra tus objetivos con una experiencia clara, visual y enfocada en progreso real.</p>
-        <div class="app-card p-3 mt-3 login-hints">
-            <div class="d-grid gap-2">
-                <div class="soft-text">Centraliza metas, calendario y mensajes en un solo lugar.</div>
-                <div class="soft-text">Recibe alertas por correo, push y SMS cuando corresponda.</div>
-                <div class="soft-text">Acceso rapido con Google, Microsoft o Facebook.</div>
+        <div class="app-card p-4 login-showcase h-100">
+            <p class="eyebrow mb-2">META INTELIGENTE</p>
+            <h1 class="hero-title compact mb-2">Inicia y sigue tu progreso diario</h1>
+            <p class="hero-copy mb-4">Un espacio claro para metas, calendario, mensajes y notificaciones en tiempo real.</p>
+            <div class="login-pill-grid mb-4">
+                <span class="login-pill">Metas y ahorro</span>
+                <span class="login-pill">Calendario</span>
+                <span class="login-pill">Mensajes</span>
+                <span class="login-pill">Alertas</span>
+            </div>
+            <div class="kpi-strip">
+                <div class="kpi-item">
+                    <small class="soft-text">Modulos</small>
+                    <strong>5</strong>
+                </div>
+                <div class="kpi-item">
+                    <small class="soft-text">Canales</small>
+                    <strong>3</strong>
+                </div>
             </div>
         </div>
         <div id="login-account-chooser" class="app-card p-4 login-account-chooser mt-3" hidden>
@@ -27,7 +38,7 @@
     <div class="col-md-9 col-lg-6" data-reveal>
         <div class="app-card p-4 login-card h-100">
             <h2 class="mb-1 login-title">Iniciar sesion</h2>
-            <p class="soft-text mb-4">Ingresa con tu usuario o usa un proveedor externo.</p>
+            <p class="soft-text mb-4">Accede con tus credenciales o un proveedor externo.</p>
             <form method="post" class="stack-sm" autocomplete="on" id="login-form">
                 <div>
                     <label class="form-label">Email o usuario</label>
@@ -59,7 +70,7 @@
             <div class="login-divider my-4">
                 <span class="soft-text">o entrar con</span>
             </div>
-            <div class="d-grid gap-2">
+            <div class="d-grid gap-2 login-social-grid">
                 {% if google_login_enabled %}
                     <a href="{{ url_for('auth_bp.google_start') }}" class="btn app-btn-ghost w-100">Google</a>
                 {% else %}

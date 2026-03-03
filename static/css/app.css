@@ -947,6 +947,27 @@ body.compact-ui .kpi-strip {
     max-width: 42ch;
 }
 
+.login-showcase {
+    background: linear-gradient(165deg, rgba(16, 36, 66, 0.88), rgba(11, 26, 49, 0.78));
+}
+
+.login-pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.login-pill {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(183, 206, 255, 0.26);
+    background: rgba(255, 255, 255, 0.04);
+    color: #e7f3ff;
+    border-radius: 999px;
+    padding: 0.26rem 0.62rem;
+    font-size: 0.84rem;
+}
+
 .login-hints {
     border-radius: var(--radius-md);
 }
@@ -1044,6 +1065,10 @@ body.compact-ui .kpi-strip {
     position: relative;
     padding: 0 0.55rem;
     background: rgba(8, 18, 35, 0.65);
+}
+
+.login-social-grid .btn {
+    min-height: 42px;
 }
 
 @media (max-width: 991px) {
